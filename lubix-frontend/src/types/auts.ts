@@ -1,0 +1,56 @@
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  tell: string;
+  password: string;
+}
+
+
+export interface VerifyEmail {
+  email: string;
+  code: string;
+}
+
+// types/auth.ts
+export interface VerifyEmailRequest {
+  email: string;
+  code: string;
+}
+
+export interface VerifyEmailResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    email: string;
+    verified: boolean;
+    token?: string;
+  };
+}
+
+export interface ResendVerificationRequest {
+  email: string;
+}
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  message: string
+  access_token: string
+  token_type: string
+  id: number
+  Nombre: string
+  email: string
+  role: string
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  code: string;
+  new_password: string;
+}
