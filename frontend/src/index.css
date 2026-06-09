@@ -1,4 +1,242 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* Puedes agregar estilos personalizados aquí */  
+
+/* ========================================
+   🎨 VARIABLES CSS GLOBALES
+   Cambia AQUÍ los colores y afecta TODA la app
+   ======================================== */
+@layer base {
+  /* Modo Claro (por defecto) */
+  html {
+    /* Fondos */
+    --color-bg: rgb(255, 255, 255);           /* Fondo principal: blanco */
+    --color-bg-secondary: rgb(249, 250, 251); /* Fondo secundario: gris muy claro */
+    --color-bg-card: rgb(255, 255, 255);      /* Fondo de cards: blanco */
+    --color-bg-input: rgb(243, 244, 246);     /* Fondo de inputs: gris claro */
+    
+    /* Textos */
+    --color-text: rgb(17, 24, 39);           /* Texto principal: negro */
+    --color-text-muted: rgb(107, 114, 128);  /* Texto secundario: gris oscuro */
+    
+    /* Bordes */
+    --color-border: rgb(229, 231, 235);      /* Borde principal: gris claro */
+    --color-border-light: rgb(243, 244, 246);/* Borde muy claro */
+    
+    /* Botones */
+    --color-btn-primary: rgb(34, 197, 94);   /* Botón principal: verde */
+    --color-btn-primary-hover: rgb(22, 163, 74); /* Botón hover: verde oscuro */
+    --color-btn-secondary: rgb(229, 231, 235);  /* Botón secundario: gris claro */
+    
+    /* Navbar */
+    --color-navbar: rgb(243, 250, 247);      /* Navbar: blanco */
+    --color-navbar-border: rgb(229, 231, 235);/* Borde navbar: gris */
+    
+    /* Acentos */
+    --color-accent: rgb(34, 197, 94);        /* Color principal: verde */
+    --color-accent-light: rgb(16, 185, 129); /* Verde claro */
+    --color-accent-dark: rgb(22, 163, 74);   /* Verde oscuro */
+    
+    /* Estado */
+    --color-success: rgb(240, 253, 244);     /* Fondo success: verde muy claro */
+    --color-success-text: rgb(22, 163, 74);  /* Texto success: verde */
+    --color-error: rgb(254, 242, 242);       /* Fondo error: rojo muy claro */
+    --color-error-text: rgb(220, 38, 38);    /* Texto error: rojo */
+    
+    /* Sombras y transiciones */
+    --transition: 300ms ease-in-out;
+    
+    @apply bg-white text-black;
+  }
+
+  /* Modo Oscuro */
+  html.dark {
+    /* Fondos */
+    --color-bg: rgb(3, 7, 18);                /* Fondo principal: casi negro */
+    --color-bg-secondary: rgb(15, 23, 42);    /* Fondo secundario: muy oscuro */
+    --color-bg-card: rgb(15, 23, 42);         /* Fondo de cards: muy oscuro */
+    --color-bg-input: rgb(30, 41, 59);        /* Fondo de inputs: gris oscuro */
+    
+    /* Textos */
+    --color-text: rgb(248, 250, 252);         /* Texto principal: blanco */
+    --color-text-muted: rgb(148, 163, 184);   /* Texto secundario: gris claro */
+    
+    /* Bordes */
+    --color-border: rgb(71, 85, 105);         /* Borde principal: gris oscuro */
+    --color-border-light: rgb(51, 65, 85);    /* Borde muy claro oscuro */
+    
+    /* Botones */
+    --color-btn-primary: rgb(34, 197, 94);    /* Botón principal: verde */
+    --color-btn-primary-hover: rgb(74, 222, 128); /* Botón hover: verde claro */
+    --color-btn-secondary: rgb(71, 85, 105);  /* Botón secundario: gris oscuro */
+    
+    /* Navbar */
+    --color-navbar: rgb(15, 23, 42);          /* Navbar: muy oscuro */
+    --color-navbar-border: rgb(51, 65, 85);   /* Borde navbar: gris oscuro */
+    
+    /* Acentos */
+    --color-accent: rgb(34, 197, 94);         /* Color principal: verde */
+    --color-accent-light: rgb(74, 222, 128);  /* Verde claro */
+    --color-accent-dark: rgb(22, 163, 74);    /* Verde oscuro */
+    
+    /* Estado */
+    --color-success: rgb(6, 78, 59);          /* Fondo success: verde muy oscuro */
+    --color-success-text: rgb(74, 222, 128);  /* Texto success: verde claro */
+    --color-error: rgb(127, 29, 29);          /* Fondo error: rojo muy oscuro */
+    --color-error-text: rgb(252, 165, 165);   /* Texto error: rojo claro */
+    
+    @apply bg-gray-950 text-white;
+  }
+
+  body {
+    @apply bg-[var(--color-bg)] text-[var(--color-text)] transition-colors;
+  }
+}
+
+/* ========================================
+   🎨 CLASES REUTILIZABLES (Componentes)
+   Úsalas en tus páginas en lugar de hardcodes
+   ======================================== */
+@layer components {
+  /* ===== CONTENEDOR PRINCIPAL ===== */
+  .page-container {
+    @apply min-h-screen transition-colors duration-300;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .section-bg {
+    @apply transition-colors duration-300;
+    background-color: var(--color-bg-secondary);
+  }
+
+  /* ===== CARDS Y CAJAS ===== */
+  .card {
+    @apply p-6 rounded-xl shadow-md border transition-all duration-300 hover:-translate-y-1;
+    background-color: var(--color-bg-card);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  .card-compact {
+    @apply p-4 rounded-lg shadow border transition-colors duration-300;
+    background-color: var(--color-bg-card);
+    border-color: var(--color-border);
+  }
+
+  .card-form {
+    @apply p-6 rounded-2xl shadow-lg border backdrop-blur-sm;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-color: var(--color-border-light);
+  }
+
+  html.dark .card-form {
+    background-color: rgba(15, 23, 42, 0.95);
+  }
+
+  /* ===== INPUTS Y FORMS ===== */
+  .input-base {
+    @apply w-full px-4 py-2.5 rounded-lg border font-medium transition-all duration-200 outline-none;
+    background-color: var(--color-bg-input);
+    color: var(--color-text);
+    border-color: var(--color-border);
+  }
+
+  .input-base:hover {
+    border-color: var(--color-accent);
+  }
+
+  .input-base:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  }
+
+  .input-base::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  /* ===== LABELS ===== */
+  .label-base {
+    @apply block text-xs uppercase tracking-wider font-semibold mb-1.5 transition-colors duration-300;
+    color: var(--color-text-muted);
+  }
+
+  /* ===== BOTONES ===== */
+  .btn-primary {
+    @apply w-full px-6 py-3 font-bold rounded-lg text-white shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-px disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+    background-color: var(--color-btn-primary);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-btn-primary-hover);
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 font-semibold rounded-lg transition-colors duration-300;
+    background-color: var(--color-btn-secondary);
+    color: var(--color-text);
+  }
+
+  .btn-accent {
+    @apply px-6 py-3 font-bold rounded-full transition-all duration-300;
+    color: var(--color-accent);
+  }
+
+  /* ===== NAVBAR ===== */
+  .navbar {
+    @apply flex items-center justify-between px-6 py-4 shadow-md border-b transition-colors duration-300;
+    background-color: var(--color-navbar);
+    border-color: var(--color-navbar-border);
+  }
+
+  .navbar-logo {
+    @apply text-2xl font-bold transition-colors duration-300;
+    color: var(--color-accent);
+  }
+
+  .navbar-link {
+    @apply transition-colors duration-300;
+    color: var(--color-text);
+  }
+
+  .navbar-link:hover {
+    color: var(--color-accent);
+  }
+
+  /* ===== MENSAJES ===== */
+  .popup-success {
+    @apply fixed top-3 left-1/2 -translate-x-1/2 z-50 p-3 rounded-xl shadow-xl max-w-sm w-[90vw] sm:w-auto mx-2 border transition-all duration-300;
+    background-color: var(--color-success);
+    color: var(--color-success-text);
+    border-color: var(--color-accent);
+  }
+
+  .popup-error {
+    @apply fixed top-3 left-1/2 -translate-x-1/2 z-50 p-3 rounded-xl shadow-xl max-w-sm w-[90vw] sm:w-auto mx-2 border transition-all duration-300;
+    background-color: var(--color-error);
+    color: var(--color-error-text);
+    border-color: var(--color-error-text);
+  }
+
+  /* ===== TEXTO ===== */
+  .text-accent {
+    @apply transition-colors duration-300;
+    color: var(--color-accent);
+  }
+
+  .text-muted {
+    @apply transition-colors duration-300;
+    color: var(--color-text-muted);
+  }
+
+  /* ===== DIVIDERS ===== */
+  .divider {
+    @apply border-t transition-colors duration-300;
+    border-color: var(--color-border);
+  }
+}
+
+/* ========================================
+   Estilos Personalizados Adicionales
+   ======================================== */
+

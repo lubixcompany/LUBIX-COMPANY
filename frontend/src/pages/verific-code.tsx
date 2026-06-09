@@ -149,13 +149,9 @@ const VerificationCode: React.FC = () => {
 
   return (
     <>
-      {/* Popup SUPER COMPACTO */}
+      {/* Popup */}
       {message && (
-        <div className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 p-2.5 sm:p-3 rounded-xl shadow-xl max-w-sm w-[90vw] sm:w-auto mx-2 border transition-all duration-300 animate-in slide-in-from-top-1 fade-in ${
-          messageType === "success" 
-            ? "bg-green-100 text-green-800 border-green-300" 
-            : "bg-red-100 text-red-800 border-red-300"
-        }`}>
+        <div className={messageType === "success" ? "popup-success" : "popup-error"}>
           <div className="flex items-center gap-1.5">
             {messageType === "success" ? "✅" : "❌"}
             <span className="font-medium text-xs sm:text-sm">{message}</span>
@@ -163,47 +159,47 @@ const VerificationCode: React.FC = () => {
         </div>
       )}
 
-      {/* FONDO COMPACTO */}
-      <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white flex items-center justify-center p-3 sm:p-4">
+      {/* Contenedor Principal */}
+      <div className="page-container flex items-center justify-center p-3 sm:p-4">
         <div className="w-full max-w-sm">
           
-          {/* Logo COMPACTO */}
+          {/* Logo */}
           <div className="text-center mb-4 sm:mb-5">
-            <h1 className="text-green-500 text-2xl sm:text-3xl font-black drop-shadow-sm mb-1 bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
+            <h1 className="text-accent text-2xl sm:text-3xl font-black drop-shadow-sm mb-1">
               Lubix
             </h1>
-            <p className="text-gray-600 text-xs sm:text-sm font-light">
+            <p className="text-muted text-xs sm:text-sm font-light">
               Verifica email
             </p>
           </div>
 
-          {/* Formulario ULTRA COMPACTO */}
+          {/* Formulario */}
           <form 
             onSubmit={handleSubmit} 
-            className="bg-white/95 backdrop-blur-sm rounded-xl p-4 sm:p-5 shadow-lg border border-gray-100 space-y-3"
+            className="card-form space-y-3"
           >
             
             {/* Email */}
             <div className="mb-3">
-              <label className="block text-gray-800 font-semibold mb-1.5 text-xs uppercase tracking-wider text-gray-700">
+              <label className="label-base">
                 Email
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-200/50 rounded-lg text-gray-900 placeholder-gray-500 text-sm font-medium transition-all duration-200 outline-none disabled:opacity-50"
+                className="input-base"
                 placeholder="tu@email.com"
                 disabled={loading}
               />
             </div>
 
-            {/* OTP SUPER COMPACTO */}
+            {/* OTP */}
             <div onPaste={handlePaste} className="mb-3">
-              <label className="block text-gray-800 font-semibold mb-1.5 text-xs uppercase tracking-wider text-gray-700">
+              <label className="label-base">
                 Código
               </label>
-              <div className="flex gap-1.5 p-2.5 bg-gray-50 border border-gray-200 rounded-lg">
+              <div className="flex gap-1.5 p-2.5 rounded-lg" style={{ backgroundColor: "var(--color-bg-input)" }}>
                 {code.map((digit, i) => (
                   <input
                     key={i}
@@ -214,20 +210,25 @@ const VerificationCode: React.FC = () => {
                     onChange={(e) => handleChange(e.target.value, i)}
                     onKeyDown={(e) => handleKeyDown(e, i)}
                     disabled={loading}
-                    className="w-10 h-10 text-lg font-bold bg-white border border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-1 focus:ring-green-200/50 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 outline-none disabled:opacity-50 flex items-center justify-center"
+                    className="w-10 h-10 text-lg font-bold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 outline-none disabled:opacity-50 flex items-center justify-center"
+                    style={{
+                      backgroundColor: "white",
+                      borderColor: "var(--color-border)",
+                      border: "1px solid var(--color-border)"
+                    }}
                   />
                 ))}
               </div>
-              <p className="text-xs text-gray-500 mt-1 text-center">
+              <p className="text-xs text-muted mt-1 text-center">
                 Ctrl+V para pegar
               </p>
             </div>
 
-            {/* Botón COMPACTO */}
+            {/* Botón */}
             <button
               type="submit"
               disabled={!isValidCode || loading || !email}
-              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-2.5 px-4 rounded-lg text-sm shadow-md hover:shadow-lg hover:-translate-y-px transition-all duration-200 transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+              className="btn-primary"
             >
               {loading ? (
                 <>
@@ -240,23 +241,28 @@ const VerificationCode: React.FC = () => {
             </button>
           </form>
 
-          {/* Reenviar COMPACTO */}
-          <div className="mt-3 pt-3 border-t border-gray-100">
+          {/* Reenviar */}
+          <div className="mt-3 pt-3 divider">
             <button
               type="button"
               onClick={handleResend}
               disabled={loading || !email}
-              className="w-full px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-800 border border-gray-200 hover:border-gray-300 rounded-lg text-xs font-medium hover:shadow-sm transition-all duration-200 disabled:opacity-50"
+              className="w-full px-4 py-2 rounded-lg text-xs font-medium hover:shadow-sm transition-all duration-200 disabled:opacity-50"
+              style={{
+                backgroundColor: "var(--color-bg-secondary)",
+                color: "var(--color-text)",
+                border: `1px solid var(--color-border)`
+              }}
             >
               Reenviar
             </button>
           </div>
 
-          {/* Link COMPACTO */}
+          {/* Link */}
           <p className="mt-3 text-center">
             <Link 
               to="/register" 
-              className="text-green-600 hover:text-green-700 text-xs font-medium hover:underline transition-colors"
+              className="text-accent text-xs font-medium hover:underline transition-colors"
             >
               Cambiar email
             </Link>

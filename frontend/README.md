@@ -2,13 +2,16 @@
 
 Frontend de la aplicación Lubix construido con **React + Vite + TypeScript + Tailwind CSS**.
 
+**Con sistema de modo oscuro/claro completamente automático e integrado.**
+
 ## 🎯 Descripción
 
 Lubix es una plataforma de gestión de usuarios y empresas. Este frontend proporciona una interfaz moderna y responsiva para:
-- Autenticación de usuarios (Login/Register)
-- Gestión de usuarios
-- Gestión de empresas
-- Dashboard con datos en tiempo real
+- ✅ Autenticación de usuarios (Login/Register)
+- ✅ Gestión de usuarios
+- ✅ Gestión de empresas
+- ✅ **Tema claro/oscuro automático** 🌙☀️
+- ✅ Dashboard con datos en tiempo real
 
 ## 🛠️ Stack Tecnológico
 
@@ -26,26 +29,324 @@ Lubix es una plataforma de gestión de usuarios y empresas. Este frontend propor
 frontend/
 ├── src/
 │   ├── components/          # Componentes reutilizables
-│   │   └── (NavBar, Cards, etc.)
+│   │   └── navbar.tsx       # Navbar con botón de tema
 │   ├── pages/               # Páginas (rutas)
 │   │   ├── login.tsx        # Página de inicio de sesión
 │   │   ├── registrer.tsx    # Página de registro
-│   │   └── Home.tsx         # Página principal (después de login)
-│   ├── services/            # Servicios HTTP y lógica
-│   │   ├── api.ts           # Instancia de axios + endpoints
-│   │   └── auth.ts          # Funciones de autenticación
+│   │   ├── reset-password.tsx
+│   │   └── Home.tsx         # Página principal
+│   ├── context/             # Context API
+│   │   ├── ThemeContext.tsx # Contexto del tema
+│   │   ├── ThemeProvider.tsx # Proveedor del tema
+│   │   ├── AuthContext.tsx
+│   │   └── AuthProvider.tsx
+│   ├── constants/           # Variables globales
+│   │   ├── colors.ts        # Colores globales (DESUSO)
+│   │   └── useThemeColor.ts # Hook para colores (DESUSO)
+│   ├── services/            # Servicios HTTP
 │   ├── App.tsx              # Componente raíz con rutas
-│   ├── App.css              # Estilos globales
-│   ├── index.css            # Directivas de Tailwind
+│   ├── index.css            # 🎨 ESTILOS GLOBALES + VARIABLES CSS
 │   └── main.tsx             # Punto de entrada
-├── public/                  # Recursos estáticos
-├── index.html               # HTML principal
-├── vite.config.ts           # Configuración de Vite
 ├── tailwind.config.js       # Configuración de Tailwind
-├── tsconfig.json            # Configuración de TypeScript
 ├── package.json             # Dependencias y scripts
 └── README.md                # Este archivo
 ```
+
+---
+
+# 🎨 SISTEMA DE COLORES Y TEMA CLARO/OSCURO
+
+Este proyecto implementa un sistema de colores centralizado basado en **variables CSS**, permitiendo cambios globales con un solo click.
+
+## 📍 ¿Dónde Están los Colores?
+
+**`src/index.css`** es el archivo principal donde se definen TODOS los colores de la aplicación.
+
+```css
+/* Modo Claro (por defecto) */
+html {
+  --color-bg: rgb(255, 255, 255);           /* Blanco */
+  --color-text: rgb(17, 24, 39);            /* Negro */
+  --color-accent: rgb(34, 197, 94);         /* Verde */
+  /* ... más colores */
+}
+
+/* Modo Oscuro (cuando html tiene clase "dark") */
+html.dark {
+  --color-bg: rgb(3, 7, 18);                /* Negro muy oscuro */
+  --color-text: rgb(248, 250, 252);         /* Blanco */
+  --color-accent: rgb(34, 197, 94);         /* Verde (igual en ambos) */
+  /* ... más colores */
+}
+```
+
+---
+
+## 🚀 ¿Cómo Cambiar Colores?
+
+### **Opción 1: Cambiar UN color globalmente (Lo más fácil)**
+
+Abre `src/index.css` y busca la sección de variables CSS:
+
+```css
+html {
+  --color-bg: rgb(255, 255, 255);    /* ← Cambiar esto */
+  --color-text: rgb(17, 24, 39);
+  --color-accent: rgb(34, 197, 94);  /* ← O esto */
+}
+```
+
+**Ejemplo:** Quieres que el verde principal sea azul:
+
+```css
+html {
+  --color-accent: rgb(59, 130, 246);  /* Azul en lugar de verde */
+}
+
+html.dark {
+  --color-accent: rgb(147, 197, 253); /* Azul claro para modo oscuro */
+}
+```
+
+✅ **LISTO.** Se cambia en TODA la app automáticamente.
+
+---
+
+### **Opción 2: Cambiar MÚLTIPLES colores**
+
+Abre `src/index.css` y personaliza la sección:
+
+```css
+/* Modo Claro */
+html {
+  --color-bg: rgb(255, 255, 255);           /* Fondo claro */
+  --color-bg-secondary: rgb(249, 250, 251); /* Fondo alternativo */
+  --color-text: rgb(17, 24, 39);            /* Texto oscuro */
+  --color-text-muted: rgb(107, 114, 128);   /* Texto gris */
+  --color-border: rgb(229, 231, 235);       /* Bordes grises */
+  --color-btn-primary: rgb(34, 197, 94);    /* Botones */
+  --color-accent: rgb(34, 197, 94);         /* Color principal */
+}
+
+/* Modo Oscuro */
+html.dark {
+  --color-bg: rgb(3, 7, 18);                /* Fondo oscuro */
+  --color-bg-secondary: rgb(15, 23, 42);
+  --color-text: rgb(248, 250, 252);         /* Texto claro */
+  --color-text-muted: rgb(148, 163, 184);
+  --color-border: rgb(71, 85, 105);
+  --color-btn-primary: rgb(34, 197, 94);
+  --color-accent: rgb(34, 197, 94);
+}
+```
+
+---
+
+## 🎯 ¿Cómo Usar los Colores en Componentes?
+
+### **Forma 1: Directamente en las clases Tailwind**
+
+```tsx
+<div className="card">
+  <h2 className="text-accent">Título</h2>
+  <p className="text-muted">Subtítulo</p>
+  <button className="btn-primary">Click</button>
+</div>
+```
+
+Las clases `card`, `btn-primary`, `text-accent`, etc. están definidas en `src/index.css` y usan automáticamente las variables CSS.
+
+### **Forma 2: Usando `style` inline (Para colores dinámicos)**
+
+```tsx
+<div style={{ backgroundColor: "var(--color-bg)", color: "var(--color-text)" }}>
+  Contenido que cambia con el tema
+</div>
+```
+
+### **Forma 3: En archivos CSS personalizados**
+
+```css
+.mi-componente {
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+```
+
+---
+
+## 📚 Clases CSS Reutilizables
+
+El proyecto viene con clases pre-hechas que cambian automáticamente:
+
+| Clase | Uso | Ejemplo |
+|-------|-----|---------|
+| `.page-container` | Contenedor principal de página | Fondo y texto automáticos |
+| `.section-bg` | Secciones alternadas | Info sections, listas |
+| `.card` | Tarjetas de contenido | Cards de info |
+| `.input-base` | Inputs de formulario | Email, password, etc. |
+| `.label-base` | Labels de formularios | Encima de inputs |
+| `.btn-primary` | Botón principal | "Iniciar Sesión" |
+| `.btn-secondary` | Botón secundario | Botones de acción |
+| `.text-accent` | Texto principal | Títulos importantes |
+| `.text-muted` | Texto secundario | Subtítulos, descripciones |
+| `.popup-success` | Mensaje de éxito | Notificaciones verdes |
+| `.popup-error` | Mensaje de error | Notificaciones rojas |
+| `.divider` | Línea divisora | Bordes entre secciones |
+
+### Ejemplo de uso:
+
+```tsx
+// Antes (Hardcoded)
+<div className="bg-white dark:bg-gray-950 text-black dark:text-white p-4">
+
+// Después (Con clases)
+<div className="card">
+```
+
+---
+
+## 🌙 ¿Cómo Funciona el Tema Claro/Oscuro?
+
+### 1️⃣ **Detección Automática al Abrir la App**
+
+```typescript
+// En src/context/ThemeProvider.tsx
+const [theme, setTheme] = useState<ThemeType>(() => {
+  // 1. Busca en localStorage si el usuario ya eligió
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme) return savedTheme;
+
+  // 2. Si no, detecta la preferencia de Windows
+  if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    return "dark";
+  }
+
+  // 3. Por defecto, claro
+  return "light";
+});
+```
+
+### 2️⃣ **Cambiar Tema (Botón en Navbar)**
+
+El usuario hace clic en el botón de luna/sol en el navbar:
+
+```tsx
+const { toggleTheme } = useTheme();
+
+<button onClick={toggleTheme}>
+  {/* Luna si está en claro, Sol si está en oscuro */}
+</button>
+```
+
+### 3️⃣ **Persitencia**
+
+El tema se guarda en `localStorage`, así que si el usuario vuelve:
+- Si eligió **oscuro**, abrirá en **oscuro**
+- Si eligió **claro**, abrirá en **claro**
+
+---
+
+## 📝 Lista Completa de Variables CSS
+
+### Fondos
+```css
+--color-bg              /* Fondo principal */
+--color-bg-secondary    /* Fondo secundario */
+--color-bg-card         /* Fondo de cards */
+--color-bg-input        /* Fondo de inputs */
+```
+
+### Textos
+```css
+--color-text            /* Texto principal */
+--color-text-muted      /* Texto secundario */
+```
+
+### Bordes
+```css
+--color-border          /* Borde principal */
+--color-border-light    /* Borde claro */
+```
+
+### Botones
+```css
+--color-btn-primary     /* Botón principal */
+--color-btn-primary-hover /* Botón principal hover */
+--color-btn-secondary   /* Botón secundario */
+```
+
+### Navbar
+```css
+--color-navbar          /* Fondo navbar */
+--color-navbar-border   /* Borde navbar */
+```
+
+### Acentos y Estado
+```css
+--color-accent          /* Color principal (verde) */
+--color-accent-light    /* Verde claro */
+--color-accent-dark     /* Verde oscuro */
+--color-success         /* Fondo success */
+--color-success-text    /* Texto success */
+--color-error           /* Fondo error */
+--color-error-text      /* Texto error */
+```
+
+---
+
+## 🔧 Paso a Paso: Agregar un Nuevo Componente CON TEMA
+
+### 1. Define la estructura HTML
+
+```tsx
+function MiComponente() {
+  return (
+    <div>
+      <h1>Mi Componente</h1>
+      <p>Descripción</p>
+      <button>Click</button>
+    </div>
+  );
+}
+```
+
+### 2. Usa las clases CSS
+
+```tsx
+function MiComponente() {
+  return (
+    <div className="card">                  {/* Usa .card */}
+      <h1 className="text-accent">Título</h1>
+      <p className="text-muted">Descripción</p>
+      <button className="btn-primary">Click</button>
+    </div>
+  );
+}
+```
+
+✅ **LISTO.** Automáticamente:
+- ✓ Tiene fondo claro en modo claro
+- ✓ Tiene fondo oscuro en modo oscuro
+- ✓ El texto cambia automáticamente
+- ✓ Los botones cambian de color
+- ✓ Los bordes se adaptan
+
+---
+
+## ⚡ Ventajas de Este Sistema
+
+✅ **Un solo archivo** para cambiar todos los colores (`src/index.css`)  
+✅ **Sin código repetido** - una clase hace todo  
+✅ **Cambios globales instantáneos** - cambias 1 variable y se actualiza en toda la app  
+✅ **Tema automático** - detecta preferencia de Windows  
+✅ **Persitencia** - recuerda la elección del usuario  
+✅ **Transiciones suaves** - cambios con animaciones  
+✅ **Modo claro** - perfecto para días  
+✅ **Modo oscuro** - perfecto para noches  
+
+---
 
 ## 🚀 Cómo Iniciar
 
@@ -78,14 +379,76 @@ Genera una carpeta `dist/` optimizada para deploy.
 npm run preview
 ```
 
-## ✅ Cambios recientes realizados
+---
+
+## ✨ Cambios Recientes Implementados
+
+### 🎨 Sistema de Tema Claro/Oscuro (NUEVO)
+
+Se implementó un sistema completo de tema claro/oscuro basado en **variables CSS**:
+
+✅ **Variables CSS centralizadas** en `src/index.css`  
+✅ **Detección automática** de preferencia de Windows al abrir la app  
+✅ **Botón luna/sol** en el navbar para cambiar manualmente  
+✅ **Persistencia** en localStorage - el tema se recuerda  
+✅ **Transiciones suaves** de 300ms entre temas  
+✅ **Clases CSS reutilizables** que cambian automáticamente:
+  - `.page-container` - Contenedor de página
+  - `.card` - Tarjetas
+  - `.input-base` - Inputs
+  - `.btn-primary` - Botones principales
+  - `.text-accent` - Texto importante
+  - `.text-muted` - Texto secundario
+  - Y más...
+
+### 🔧 Cómo Funciona
+
+1. **Archivos clave:**
+   - `src/context/ThemeContext.tsx` - Define el contexto
+   - `src/context/ThemeProvider.tsx` - Lógica del tema
+   - `src/index.css` - Variables CSS y clases
+   - `src/main.tsx` - Envuelve con ThemeProvider
+
+2. **Flujo:**
+   ```
+   Usuario abre app
+   ↓
+   ThemeProvider detecta preferencia de Windows o localStorage
+   ↓
+   Aplica clase "dark" a <html>
+   ↓
+   Las variables CSS cambian automáticamente
+   ↓
+   Toda la app se ve clara u oscura
+   ```
+
+3. **Usuario hace clic en botón de luna:**
+   ```
+   Click en botón
+   ↓
+   toggleTheme() ejecuta
+   ↓
+   Clase "dark" se agrega/remueve
+   ↓
+   Variables CSS cambian
+   ↓
+   localStorage guarda la preferencia
+   ```
+
+### 📖 Documentación Completa
+
+Lee la sección **"🎨 SISTEMA DE COLORES Y TEMA CLARO/OSCURO"** arriba en este README para:
+- Cómo cambiar colores
+- Cómo usar en componentes
+- Lista de variables CSS
+- Ejemplos prácticos
 
 ### 1. Dependencias ajustadas y más seguras
 Se dejaron las versiones de los paquetes con números exactos en `package.json`, en lugar de usar rangos amplios.
 Esto ayuda a:
-- evitar cambios inesperados al instalar
-- reproducir el proyecto igual en cualquier equipo
-- reducir riesgo de incompatibilidades y vulnerabilidades
+- Evitar cambios inesperados al instalar
+- Reproducir el proyecto igual en cualquier equipo
+- Reducir riesgo de incompatibilidades y vulnerabilidades
 
 ### 2. Registro unificado: usuario y empresa en una sola pantalla
 La página de registro ahora funciona como un solo formulario con un selector superior para elegir entre:
@@ -93,10 +456,10 @@ La página de registro ahora funciona como un solo formulario con un selector su
 - Empresa
 
 Cuando se selecciona "Empresa", aparecen campos extra como:
-- nombre de la empresa
+- Nombre de la empresa
 - NIT
-- dirección
-- sector
+- Dirección
+- Sector
 
 El diseño visual no cambió, solo se hizo dinámico.
 

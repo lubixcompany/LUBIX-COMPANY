@@ -35,32 +35,33 @@ const HomeUsuario: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="page-container">
       {/* NAVBAR */}
       <NavbarUsuario />
 
       {/* HERO */}
-      <section className="flex flex-col md:flex-row justify-between items-center px-8 md:px-16 py-20 min-h-[calc(100vh-80px)] bg-white">
+      <section className="flex flex-col md:flex-row justify-between items-center px-8 md:px-16 py-20 min-h-[calc(100vh-80px)]" style={{ backgroundColor: "var(--color-bg)" }}>
         <div className="max-w-lg text-center md:text-left mr-8">
-          <div className="text-green-600 mb-2 text-sm font-semibold uppercase tracking-wide">
+          <div className="text-accent mb-2 text-sm font-semibold uppercase tracking-wide">
             👋 Hola 
           </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight" style={{ color: "var(--color-text)" }}>
             Bienvenido de nuevo a Lubix
           </h1>
-          <p className="text-lg text-gray-700 mb-6">
-            Explora tus <span className="font-bold text-green-600">compras, perfil y configuración</span> de manera rápida y sencilla.
+          <p className="text-lg text-muted mb-6">
+            Explora tus <span className="font-bold text-accent">compras, perfil y configuración</span> de manera rápida y sencilla.
           </p>
           <Link
             to="/ofertas"
-            className="inline-block bg-green-500 text-white font-bold px-6 py-3 rounded-full shadow hover:bg-green-600 transition"
+            className="inline-block text-white font-bold px-6 py-3 rounded-full shadow hover:shadow-lg transition"
+            style={{ backgroundColor: "var(--color-btn-primary)" }}
           >
             Ver Ofertas
           </Link>
         </div>
 
         {/* Carrusel de Ofertas */}
-        <div className="mt-10 md:mt-0 w-[420px] h-[500px] rounded-3xl shadow-2xl overflow-hidden flex flex-col items-center justify-between bg-white transform transition-all duration-700 ease-in-out hover:scale-105">
+        <div className="mt-10 md:mt-0 w-[420px] h-[500px] rounded-3xl shadow-2xl overflow-hidden flex flex-col items-center justify-between transform transition-all duration-700 ease-in-out hover:scale-105" style={{ backgroundColor: "var(--color-bg-card)" }}>
           <img 
             src={ofertas[index].imagen} 
             alt={ofertas[index].titulo} 
@@ -71,7 +72,8 @@ const HomeUsuario: React.FC = () => {
             <p className="mb-3 text-sm">{ofertas[index].descripcion}</p>
             <Link 
               to="/ofertas"
-              className="bg-white text-emerald-700 font-semibold px-4 py-1.5 rounded-full shadow hover:bg-gray-200 transition text-sm"
+              className="text-emerald-700 font-semibold px-4 py-1.5 rounded-full shadow hover:bg-gray-200 transition text-sm"
+              style={{ backgroundColor: "white" }}
             >
               Comprar ahora
             </Link>
@@ -80,24 +82,24 @@ const HomeUsuario: React.FC = () => {
       </section>
 
       {/* INFO */}
-      <section className="grid md:grid-cols-3 gap-8 px-8 md:px-16 py-16 bg-gray-50">
-        <div className="bg-white p-6 rounded-xl shadow hover:-translate-y-1 transition">
-          <h2 className="text-green-600 mb-3 text-xl font-semibold">Tus Compras</h2>
-          <p className="text-gray-700 text-sm leading-relaxed">
+      <section className="grid md:grid-cols-3 gap-8 px-8 md:px-16 py-16 section-bg">
+        <div className="card">
+          <h2 className="text-accent mb-3 text-xl font-semibold">Tus Compras</h2>
+          <p className="text-muted text-sm leading-relaxed">
             Revisa tu historial de compras y sigue el estado de tus pedidos.
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow hover:-translate-y-1 transition">
-          <h2 className="text-green-600 mb-3 text-xl font-semibold">Perfil</h2>
-          <p className="text-gray-700 text-sm leading-relaxed">
+        <div className="card">
+          <h2 className="text-accent mb-3 text-xl font-semibold">Perfil</h2>
+          <p className="text-muted text-sm leading-relaxed">
             Edita tu información personal, cambia tu contraseña y gestiona tus preferencias.
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow hover:-translate-y-1 transition">
-          <h2 className="text-green-600 mb-3 text-xl font-semibold">Configuración</h2>
-          <p className="text-gray-700 text-sm leading-relaxed">
+        <div className="card">
+          <h2 className="text-accent mb-3 text-xl font-semibold">Configuración</h2>
+          <p className="text-muted text-sm leading-relaxed">
             Ajusta tu experiencia: notificaciones, seguridad y más.
           </p>
         </div>

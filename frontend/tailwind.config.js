@@ -1,5 +1,6 @@
 // tailwind.config.js
 module.exports = {
+  darkMode: "class", // Habilita dark mode por clase CSS
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
@@ -16,3 +17,4 @@ module.exports = {
   },
   plugins: [],
 };
+
