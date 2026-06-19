@@ -104,6 +104,86 @@ const HomeUsuario: React.FC = () => {
           </p>
         </div>
       </section>
+
+      {/* CATEGORÍAS PRINCIPALES */}
+      <section className="card">
+        <h2 className="text-3xl font-bold mb-10 text-center">Categorías Principales</h2>
+        <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+          {[
+            { nombre: "Computadoras", icono: "💻" },
+            { nombre: "Celulares", icono: "📱" },
+            { nombre: "Audio", icono: "🎧" },
+            { nombre: "Cámaras", icono: "📷" },
+            { nombre: "Wearables", icono: "⌚" },
+            { nombre: "Gaming", icono: "🎮" },
+          ].map((cat, i) => (
+            <div key={i} className="card">
+              <div className="text-4xl mb-3">{cat.icono}</div>
+              <h3 className="font-semibold text-lg">{cat.nombre}</h3>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* PRODUCTOS DESTACADOS */}
+      <section className="card">
+        <h2 className="text-3xl font-bold mb-10 text-center text-emerald-700">Productos Destacados</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { nombre: "MacBook Pro 14\" M3 Pro", desc: "Laptop de alto rendimiento", precio: 9562500, antes: 11250000, descuento: "-15%", imagen: "/macbook.png" },
+            { nombre: "Auriculares Premium", desc: "Cancelación de ruido", precio: 1080000, antes: 1350000, descuento: "-20%", imagen: "/headphones.png" },
+            { nombre: "iPhone 15 Pro Max", desc: "256GB Titanio Azul", precio: 5400000, antes: null, descuento: null, imagen: "/iphone15.png" },
+          ].map((prod, i) => (
+            <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden hover:-translate-y-2 transition">
+              <img src={prod.imagen} alt={prod.nombre} className="w-full h-56 object-cover" />
+              <div className="p-6">
+                <h3 className="font-bold text-lg mb-1">{prod.nombre}</h3>
+                <p className="text-sm text-gray-600 mb-3">{prod.desc}</p>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-emerald-600 font-bold text-xl">${prod.precio.toLocaleString()}</span>
+                  {prod.antes && (
+                    <span className="line-through text-gray-400">${prod.antes.toLocaleString()}</span>
+                  )}
+                  {prod.descuento && (
+                    <span className="bg-yellow-400 text-gray-900 text-xs font-bold px-2 py-1 rounded">{prod.descuento}</span>
+                  )}
+                </div>
+                <button className="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold hover:bg-emerald-700 transition">
+                  Agregar al carrito
+                </button>
+              </div>
+            </div>
+          ))}
+          
+        </div>
+         <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { nombre: "MacBook Pro 14\" M3 Pro", desc: "Laptop de alto rendimiento", precio: 9562500, antes: 11250000, descuento: "-15%", imagen: "/macbook.png" },
+            { nombre: "Auriculares Premium", desc: "Cancelación de ruido", precio: 1080000, antes: 1350000, descuento: "-20%", imagen: "/headphones.png" },
+            { nombre: "iPhone 15 Pro Max", desc: "256GB Titanio Azul", precio: 5400000, antes: null, descuento: null, imagen: "/iphone15.png" },
+          ].map((prod, i) => (
+            <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden hover:-translate-y-2 transition">
+              <img src={prod.imagen} alt={prod.nombre} className="w-full h-56 object-cover" />
+              <div className="p-6">
+                <h3 className="font-bold text-lg mb-1">{prod.nombre}</h3>
+                <p className="text-sm text-gray-600 mb-3">{prod.desc}</p>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-emerald-600 font-bold text-xl">${prod.precio.toLocaleString()}</span>
+                  {prod.antes && (
+                    <span className="line-through text-gray-400">${prod.antes.toLocaleString()}</span>
+                  )}
+                  {prod.descuento && (
+                    <span className="bg-yellow-400 text-gray-900 text-xs font-bold px-2 py-1 rounded">{prod.descuento}</span>
+                  )}
+                </div>
+                <button className="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold hover:bg-emerald-700 transition">
+                  Agregar al carrito
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 };

@@ -1,300 +1,90 @@
 # Lubix - Backend
 
-Backend con base de datos para el proyecto **Lubix**, desarrollado por **Yeinher Algarin**.
+Backend con base de datos para el proyecto Lubix, desarrollado por **Yeinher Algarin**.
 
 ## Descripción
-
 Este proyecto sirve como backend para Lubix, implementando operaciones CRUD y conexión con base de datos PostgreSQL.  
-Incluye autenticación, gestión de usuarios y envío de correos electrónicos utilizando FastAPI, SQLAlchemy y SMTP con Gmail.
+Se implementa autenticación y gestión de datos utilizando FastAPI y SQLAlchemy.
 
-Version **1.1**
+version alpha V.0.1
 
-## Tecnologías y herramientas
+## Tecnologías y Herramientas
 
 | Tecnología / Herramienta | Uso |
 |--------------------------|-----|
-| Python 3.13 | Lenguaje principal del backend |
-| FastAPI | Framework para construcción de APIs |
-| Uvicorn | Servidor ASGI |
-| SQLAlchemy | ORM para PostgreSQL |
-| Alembic | Migraciones de base de datos |
-| PostgreSQL | Base de datos relacional |
-| psycopg2-binary | Driver PostgreSQL |
-| Pydantic | Validación de datos |
-| python-jose | JWT y autenticación |
-| bcrypt | Hash de contraseñas |
-| SMTP (smtplib) | Envío de correos |
-| python-dotenv | Variables de entorno |
-| Docker | Contenerización |
-| Docker Compose | Orquestación de contenedores |
-| MinIO | Para almacenar imagenes, archivos, etc |
-| MinIO SDK | Conexión con MinIO |
-| UV | Gestión moderna de dependencias |
-| pip-audit | Auditoría de CVEs |
-| venv | Entorno virtual |
+| Python 3.14.3 | Lenguaje principal del backend |
+| venv | Entorno virtual para Python |
+| FastAPI | Framework para APIs (CRUD) |
+| Uvicorn | Servidor ASGI para correr FastAPI |
+| SQLAlchemy | ORM (Object Relational Mapping) para manejar la base de datos |
+| PostgreSQL 18.3 | Base de datos relacional |
+| psycopg2-binary | Driver para conexión con PostgreSQL |
+| python-dotenv | Leer variables de entorno desde archivos `.env` |
 
-## Funcionalidades implementadas
-
-- Registro de usuarios.
-- Inicio de sesión con JWT.
-- Middleware de autenticación.
-- Encriptación de contraseñas con bcrypt.
-- Recuperación de contraseña mediante correo electrónico.
-- Verificación de cuenta por correo electrónico.
-- Gestión de usuarios.
-- Gestión de empresas.
-- CRUD mediante FastAPI y SQLAlchemy.
-- Migraciones con Alembic.
-- Integración con PostgreSQL.
-- Integración con MinIO para almacenamiento de archivos.
-- Gestión de buckets.
-- Almacenamiento de imágenes y documentos.
-- Dockerización completa del proyecto.
-- Auditoría de dependencias mediante pip-audit.
-- Gestión de dependencias con UV.
-
-## Estructura de carpetas
+## Estructura de Carpetas
 
 ```text
 LUBIX-BACKEND/
 │
-├── app/
-│   ├── Config.py 
-│   ├── main.py
-│   │
-│   ├── database/
-│   │   └── Connection.py
-│   │
-│   ├── docs/
-│   │   ├── AUDITORIA.md
-│   │   └── ENDPOINTS.md
-│   │
-│   ├── middleware/
-│   │   ├── AuthMiddleware.py
-│   │   └── CorsMiddleware.py
-│   │
-│   ├── models/
-│   │   ├── ModelCode.py
-│   │   ├── ModelCompany.py
-│   │   ├── ModelEventToken.py
-│   │   ├── ModelUser.py
-│   │   └── __init__.py
-│   │
-│   ├── routers/
-│   │   ├── HealthRouter.py
-│   │   └── UserRouters.py
-│   │
-│   ├── schemas/
-│   │   ├── SchemaAuthCompany.py
-│   │   └── SchemaAuthUser.py
-│   │
-│   ├── services/
-│   │   ├── AuthUser.py
-│   │   ├── NasService.py
-│   │   │
-│   │   └── email/
-│   │       ├── EmailService.py
-│   │       ├── SaveAndGenerateCode.py
-│   │       │
-│   │       └── template/
-│   │           ├── EmailForgotPassword.py
-│   │           └── EmailVerify.py
-│   │
-│   └── utils/
-│       ├── CheckNetwork.py
-│       ├── Jwt.py
-│       ├── Security.py
-│       └── TestDatabase.py
-│
-├── alembic/
-├── alembic.ini
-├── pyproject.toml
-├── uv.lock
-├── docker-compose.yml
-├── Dockerfile
-├── .env.example
-└── README.md
+├─ app/
+│  ├─ main.py             # Entrada principal de la aplicación FastAPI
+│  ├─ database/
+|  |  └─ connection.py    # Configuracion de la base de datos
+│  ├─ docs/
+|  |  └─ ENDPOINTS.md     # documentacion de endpoints
+|  ├─ models/
+|  |  ├─__init__.py       # Iniciar modelos
+|  |  ├─company.py        # Define la tabla empresa
+|  |  └─ user.py          # Define la tabla usuario
+│  ├─ routers/            # Carpeta con routers de endpoints
+│  |   └─ user.py         # routers usuario
+│  ├─ schemas/            # Estructura de entrada y salida de datos en la api
+|  |  ├─company.py        
+|  |  └─user.py           
+|  └─ utils/
+|     ├─ testDatabase.py  # Prueba de conexion de base de datos
+|     └─ jwt.py           # JSON WEB TOKEN (generar tokens ) no implementado todavia...
+├─ .env                   # Variables de entorno
+├─ requirements.txt       # Dependencias del proyecto
+├─ README.md              # Documentación del proyecto
+└─ venv/                  # Entorno virtual de Python
 ```
+
 
 ## Instalación
 
-Sigue estos pasos para ejecutar el proyecto en tu máquina local:
-
-### 1. Clonar el repositorio
-```bash
-git clone https://github.com/RehnieyAl/lubix-backend.git
-cd lubix-backend
-```
-## Instalación sin Docker
-
 Sigue estos pasos para configurar el proyecto en tu máquina local:
 
-### 1. Clonar el repositorio
+1. **Clonar el repositorio**  
+   ```bash
+   git clone https://github.com/RehnieyAl/LUBIX-BACKEND.git
+   cd LUBIX-BACKEND
+   ```
+   
+2. **Activar entorno virtual venv**
+    ```bash
+    python -m venv venv
+    ```
+2.1 **linux/macOS**
+    ```bash
+    source venv/bin/activate
+    ``` 
+2.2 **windows**
+    ```bash
+    venv\Scripts\activate
+    ```
+3 **Instalar dependencias**
+    ```bash
+    pip install -r requierements.txt
+    ```
 
-```bash
-git clone https://github.com/RehnieyAl/lubix-backend.git
-cd lubix-backend
-```
-
-### 2. Crear entorno virtual con UV
-
-```bash
-uv venv
-```
-
-### 3. Activar entorno virtual
-
-Linux/macOS:
-
-```bash
-source .venv/bin/activate
-```
-
-Windows:
-
-```powershell
-.venv\Scripts\activate
-```
-
-### 4. Instalar dependencias
-
-```bash
-uv sync
-```
-
-### 5. Crear variable de entorno .env con .env.example
-
-```text
-Crear archivo .env basado en .env.example
-```
-
-Linux/macOS:
-
-```bash
-cp .env.example .env
-```
-
-Windows:
-
-```powershell
-copy .env.example .env
-```
-
-### 6. Configurar variables de entorno
-
-Configurar las variables necesarias para:
-
-* PostgreSQL
-* JWT
-* SMTP
-* MinIO
-
-### 7. Ejecutar migraciones
-
-Si es la primera migración:
-
-```bash
-uv run alembic revision --autogenerate -m "Initial migration"
-uv run alembic upgrade head
-```
-
-Si las migraciones ya existen:
-
-```bash
-uv run alembic upgrade head
-```
-
-### 8. Iniciar servidor backend
-
-```bash
-uv run uvicorn app.main:app --reload
-```
-
-### 9. Acceder a la documentación
-
-Swagger:
-
-```text
-http://localhost:8000/docs
-```
-
-ReDoc:
-
-```text
-http://localhost:8000/redoc
-```
-
----
-
-## Instalación con Docker
-
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/RehnieyAl/lubix-backend.git
-cd lubix-backend
-```
-
-### 2. Crear variable de entorno .env con .env.example
-
-```text
-Crear archivo .env basado en .env.example
-```
-
-Linux/macOS:
-
-```bash
-cp .env.example .env
-```
-
-Windows:
-
-```powershell
-copy .env.example .env
-```
-
-### 3. Construir contenedores
-
-```bash
-docker compose build
-```
-
-### 4. Levantar contenedores
-
-```bash
-docker compose up -d
-```
-
-### 5. Ejecutar migraciones dentro del contenedor
-
-Si es la primera migración:
-
-```bash
-docker compose exec backend uv run alembic revision --autogenerate -m "Initial migration"
-docker compose exec backend uv run alembic upgrade head
-```
-
-Si las migraciones ya existen:
-
-```bash
-docker compose exec backend uv run alembic upgrade head
-```
-
-### 6. Verificar contenedores
-
-```bash
-docker compose ps
-```
-
-### 7. Ver logs del backend
-
-```bash
-docker compose logs -f backend
-```
-
-### 8. Iniciar servidor manualmente (si es necesario)
-
-```bash
-docker compose exec backend uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
+4. **Crear archivo .env afuera de la carpeta app y añadir este codigo**
+    ```bash
+    URL_DATABASE = "postgresql://tu_usuario_en_posgresql:contraseña@localhost:tupuerto/tubasededatos"
+    ```
+5. **Iniciar servidor backend**
+    ```bash
+    cd app
+    uvicorn main:app --reload
+    ```
+## Backend hecho por mi

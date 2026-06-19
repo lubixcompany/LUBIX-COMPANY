@@ -1,49 +1,21 @@
-
-```text
 http://127.0.0.1:8000/
 
-para probar conexion de base de datos desde el backend:
-POSTDATA: debe tener previamente postgre sql con usuario, contraseña y base de datos
-GET /health/test
 
--- Usuario
+ -- Usuario
+
 --  registrar usuario
 POST user/register
 {
-  "fullName": "",
-  "email": "",
-  "tell": "",
-  "password": ""
+  "fullName": "Yeinher Algarin",
+  "email": "yeinersaku@gmail.com",
+  "tell": "3023110351",
+  "password": "swapswap"
 }
-
-verify account
-POST user/verify-email
-{
-  "email": "",
-  "code": ""
-}
-
-export default App
 
 -- login 
-POST user/login
+POST user/singIn
+data: falta un byc para ocultar contraseña
 {
-  "email": "",
-  "password": ""
+  "email": "yeinersaku@gmail.com",
+  "password": "swapswap"
 }
-
--- forgot password
-POST user/forgot-password
-{
-  "email": ""
-}
-
--- reset password
-POST user/reset-password
-{
-  "email": "",
-  "code": "",
-  "new_password":""
-}
-
-```

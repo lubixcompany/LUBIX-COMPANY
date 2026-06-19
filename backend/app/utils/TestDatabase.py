@@ -1,12 +1,11 @@
 from sqlalchemy import text
-from app.database.Connection import engine
+from database.connection import engine
 
-## Testeo de conexion de base de datos desde el backend
+## Testeo de conexion de base de datos
 def db_test():
     try:
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
-            return {"Base de datos": "OK"}
+            return {"Estado":"OK"}
     except Exception as e:
-        return {"Base de datos": "ERROR", "detail": str(e)}
-    
+        return {"Estado": "ERROR", "detail": str(e)}
