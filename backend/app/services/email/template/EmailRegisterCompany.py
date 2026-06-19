@@ -1,9 +1,9 @@
 from app.services.email.EmailService import send_email
 
 
-def EmailVerify(to_email: str, code: str, code_type: str):
+def EmailRegisterCompany(to_email: str,company_name: str,company_nit: str):
 
-    subject = "Verificación de correo"
+    subject = "Solicitud de registro de empresa recibida"
 
     body = f"""
     <!DOCTYPE html>
@@ -11,7 +11,7 @@ def EmailVerify(to_email: str, code: str, code_type: str):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Verificación de correo</title>
+        <title>Registro de Empresa</title>
     </head>
 
     <body style="
@@ -55,54 +55,18 @@ def EmailVerify(to_email: str, code: str, code_type: str):
                                     margin-top:0;
                                     color:#111827;
                                 ">
-                                    Verificación de correo
+                                    Solicitud de registro recibida
                                 </h2>
 
                                 <p style="
                                     color:#4b5563;
                                     line-height:1.7;
                                 ">
-                                    Hemos recibido una solicitud para verificar tu
-                                    correo electrónico en <strong>Lubix</strong>.
+                                    Hemos recibido correctamente la solicitud de registro
+                                    de tu empresa en <strong>Lubix</strong>.
                                 </p>
 
-                                <p style="
-                                    color:#4b5563;
-                                    line-height:1.7;
-                                ">
-                                    Utiliza el siguiente código para completar el proceso:
-                                </p>
-
-                                <!-- Verification Code -->
-                                <table width="100%" cellpadding="0" cellspacing="0"
-                                    style="
-                                        background:#f9fafb;
-                                        border:1px solid #e5e7eb;
-                                        border-radius:8px;
-                                        margin:25px 0;
-                                    ">
-                                    <tr>
-                                        <td align="center" style="padding:25px;">
-
-                                            <span style="
-                                                display:inline-block;
-                                                background:#eef2ff;
-                                                color:#00E65A;
-                                                padding:15px 30px;
-                                                font-size:32px;
-                                                font-weight:bold;
-                                                letter-spacing:8px;
-                                                border-radius:8px;
-                                                font-family:monospace;
-                                            ">
-                                                {code}
-                                            </span>
-
-                                        </td>
-                                    </tr>
-                                </table>
-
-                                <!-- Information -->
+                                <!-- Company Info -->
                                 <table width="100%" cellpadding="0" cellspacing="0"
                                     style="
                                         background:#f9fafb;
@@ -114,18 +78,26 @@ def EmailVerify(to_email: str, code: str, code_type: str):
                                         <td style="padding:20px;">
 
                                             <p style="
+                                                margin:0 0 10px 0;
+                                                color:#374151;
+                                            ">
+                                                <strong>Empresa:</strong>
+                                                {company_name}
+                                            </p>
+
+                                            <p style="
                                                 margin:0;
                                                 color:#374151;
                                             ">
-                                                <strong>Tiempo de expiración:</strong>
-                                                10 minutos
+                                                <strong>NIT:</strong>
+                                                {company_nit}
                                             </p>
 
                                         </td>
                                     </tr>
                                 </table>
 
-                                <!-- Security Notice -->
+                                <!-- Status -->
                                 <table width="100%" cellpadding="0" cellspacing="0"
                                     style="
                                         background:#fff7ed;
@@ -141,7 +113,7 @@ def EmailVerify(to_email: str, code: str, code_type: str):
                                                 color:#b45309;
                                                 font-weight:bold;
                                             ">
-                                                Aviso de seguridad
+                                                Estado: En revisión
                                             </p>
 
                                             <p style="
@@ -149,13 +121,24 @@ def EmailVerify(to_email: str, code: str, code_type: str):
                                                 color:#92400e;
                                                 line-height:1.6;
                                             ">
-                                                Si no solicitaste este código,
-                                                puedes ignorar este correo de forma segura.
+                                                Nuestro equipo validará la información
+                                                suministrada. Recibirás una respuesta
+                                                en un plazo máximo de
+                                                <strong>3 días hábiles</strong>.
                                             </p>
 
                                         </td>
                                     </tr>
                                 </table>
+
+                                <p style="
+                                    color:#4b5563;
+                                    line-height:1.7;
+                                ">
+                                    Una vez finalizada la revisión, te notificaremos
+                                    si la empresa ha sido aprobada o si necesitamos
+                                    información adicional.
+                                </p>
 
                             </td>
                         </tr>

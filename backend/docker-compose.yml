@@ -1,0 +1,84 @@
+services:
+  minio:
+    image: minio/minio:latest
+
+    container_name: lubix-minio
+
+    restart: always
+
+    env_file:
+    # Carga las variables de entorno desde el archivo .env
+    # En la raiz del backend
+      - .env
+
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+
+    ports:
+      - "9000:9000"
+    
+    volumes:
+      - minio_data:/data
+
+    command: server /data
+
+  postgres:
+    image: postgres:16
+
+    container_name: lubix-postgres
+
+    restart: always
+
+    env_file:
+    # Carga las variables de entorno desde el archivo .env
+    # En la raiz del backend
+      - .env
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      - "5434:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      # Ruta al Dockerfile
+      # El contexto es el directorio actual (donde se encuentra el Dockerfile) del
+      # backend. Asegúrate de que el Dockerfile esté en la raíz del proyecto backend.
+      context: .
+      dockerfile: Dockerfile
+      
+    container_name: lubix-backend
+ 
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+
+    ports:
+      - "8001:8000"
+
+    volumes:
+      - .:/app
+
+    depends_on:
+      - postgres
+      - minio
+
+    env_file:
+    # Carga las variables de entorno desde el archivo .env
+    # En la raiz del backend
+      - .env
+
+    restart: always
+
+    command: uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+  minio_data:

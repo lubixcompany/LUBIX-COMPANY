@@ -8,7 +8,7 @@ GET /health/test
 
 -- Usuario
 --  registrar usuario
-POST user/register
+POST Auth/register-user
 {
   "fullName": "",
   "email": "",
@@ -16,8 +16,27 @@ POST user/register
   "password": ""
 }
 
+-- registro de empresa
+post /Auth/register-company
+{
+  "companyName": "",
+  "companyEmail": "",
+  "companyPassword": "",
+  "companyTell": "",
+  "companyAddress": "",
+  "companyNIT": "",
+  "companyNITDV": ""
+}
+
+--- login company
+post /Auth/login-company
+{
+  "companyNIT": "",
+  "companyPassword": ""
+}
+
 verify account
-POST user/verify-email
+POST Auth/verify-email
 {
   "email": "",
   "code": ""
@@ -26,20 +45,20 @@ POST user/verify-email
 export default App
 
 -- login 
-POST user/login
+POST Auth/login
 {
   "email": "",
   "password": ""
 }
 
 -- forgot password
-POST user/forgot-password
+POST Auth/forgot-password
 {
   "email": ""
 }
 
 -- reset password
-POST user/reset-password
+POST Auth/reset-password
 {
   "email": "",
   "code": "",

@@ -1,6 +1,6 @@
 from app.services.email.EmailService import send_email
 
-def EmailForgotPassword(to_email: str, code: str, code_type: str):
+def EmailForgotPassword(to_email: str, code: str):
 
     subject = "Recuperación de contraseña"
 
@@ -10,6 +10,7 @@ def EmailForgotPassword(to_email: str, code: str, code_type: str):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Recuperación de contraseña</title>
     </head>
 
     <body style="
@@ -28,14 +29,15 @@ def EmailForgotPassword(to_email: str, code: str, code_type: str):
                             background:#ffffff;
                             border-radius:12px;
                             overflow:hidden;
-                            box-shadow:0 4px 10px rgba(0,0,0,.1);
+                            border:1px solid #e5e7eb;
                         ">
 
+                        <!-- Header -->
                         <tr>
                             <td align="center"
                                 style="
-                                    background:#007d2a;
-                                    color:#ffffff;
+                                    background:#00E65A;
+                                    color:#0f172a;
                                     padding:30px;
                                 ">
                                 <h1 style="margin:0;">
@@ -44,66 +46,137 @@ def EmailForgotPassword(to_email: str, code: str, code_type: str):
                             </td>
                         </tr>
 
+                        <!-- Content -->
                         <tr>
                             <td style="padding:30px;">
 
-                                <h2 style= color:#>
+                                <h2 style="
+                                    margin-top:0;
+                                    color:#111827;
+                                ">
                                     Recuperación de contraseña
                                 </h2>
 
-                                <p>
-                                    Hemos recibido una solicitud para
-                                    recuperar tu contraseña.
-                                </p>
-
-                                <p>
-                                    Usa el siguiente código:
-                                </p>
-
-                                <div style="
-                                    text-align:center;
-                                    margin:30px 0;
+                                <p style="
+                                    color:#4b5563;
+                                    line-height:1.7;
                                 ">
-                                    <span style="
-                                        display:inline-block;
-                                        background:#eef2ff;
-                                        color:#007d2a;
-                                        padding:15px 30px;
-                                        font-size:32px;
-                                        font-weight:bold;
-                                        letter-spacing:8px;
+                                    Hemos recibido una solicitud para restablecer la
+                                    contraseña de tu cuenta en <strong>Lubix</strong>.
+                                </p>
+
+                                <p style="
+                                    color:#4b5563;
+                                    line-height:1.7;
+                                ">
+                                    Utiliza el siguiente código para continuar:
+                                </p>
+
+                                <!-- Recovery Code -->
+                                <table width="100%" cellpadding="0" cellspacing="0"
+                                    style="
+                                        background:#f9fafb;
+                                        border:1px solid #e5e7eb;
                                         border-radius:8px;
+                                        margin:25px 0;
                                     ">
-                                        {code}
-                                    </span>
-                                </div>
+                                    <tr>
+                                        <td align="center" style="padding:30px;">
 
-                                <p>
-                                    Tipo de código:
-                                    <strong>{code_type}</strong>
-                                </p>
+                                            <span style="
+                                                display:inline-block;
+                                                color:#00E65A;
+                                                font-size:40px;
+                                                font-weight:bold;
+                                                letter-spacing:10px;
+                                                font-family:monospace;
+                                            ">
+                                                {code}
+                                            </span>
 
-                                <p>
-                                    Este código expirará en 10 minutos.
-                                </p>
+                                        </td>
+                                    </tr>
+                                </table>
 
-                                <p>
-                                    Si no solicitaste este cambio,
-                                    ignora este correo.
-                                </p>
+                                <!-- Information -->
+                                <table width="100%" cellpadding="0" cellspacing="0"
+                                    style="
+                                        background:#f9fafb;
+                                        border:1px solid #e5e7eb;
+                                        border-radius:8px;
+                                        margin:20px 0;
+                                    ">
+                                    <tr>
+                                        <td style="padding:20px;">
+
+                                            <p style="
+                                                margin:0 0 10px 0;
+                                                color:#374151;
+                                            ">
+                                                <strong>Proceso:</strong>
+                                                Recuperación de contraseña
+                                            </p>
+
+                                            <p style="
+                                                margin:0;
+                                                color:#374151;
+                                            ">
+                                                <strong>Expira en:</strong>
+                                                10 minutos
+                                            </p>
+
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Security Notice -->
+                                <table width="100%" cellpadding="0" cellspacing="0"
+                                    style="
+                                        background:#fff7ed;
+                                        border:1px solid #fed7aa;
+                                        border-radius:8px;
+                                        margin:20px 0;
+                                    ">
+                                    <tr>
+                                        <td style="padding:20px;">
+
+                                            <p style="
+                                                margin:0;
+                                                color:#b45309;
+                                                font-weight:bold;
+                                            ">
+                                                Aviso de seguridad
+                                            </p>
+
+                                            <p style="
+                                                margin-top:10px;
+                                                color:#92400e;
+                                                line-height:1.6;
+                                            ">
+                                                Nunca compartas este código con terceros.
+                                                Si no solicitaste recuperar tu contraseña,
+                                                puedes ignorar este correo de forma segura.
+                                            </p>
+
+                                        </td>
+                                    </tr>
+                                </table>
 
                             </td>
                         </tr>
 
+                        <!-- Footer -->
                         <tr>
                             <td align="center"
                                 style="
-                                    background:#f8f9fa;
+                                    background:#f9fafb;
+                                    color:#6b7280;
                                     padding:20px;
-                                    color:#777;
                                     font-size:12px;
                                 ">
-                                © 2026 Lubix
+                                © 2026 Lubix. Todos los derechos reservados.
+                                <br>
+                                Este es un mensaje automático, por favor no respondas este correo.
                             </td>
                         </tr>
 
@@ -116,4 +189,6 @@ def EmailForgotPassword(to_email: str, code: str, code_type: str):
     </body>
     </html>
     """
+
     return send_email(to_email, subject, body)
+

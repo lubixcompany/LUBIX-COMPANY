@@ -30,18 +30,25 @@ class Codes(Base):
     type: Mapped[typeCode] = mapped_column(
         Enum(typeCode, name="type_code_enum")
     )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow    
     )
+
     expires_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=lambda: datetime.utcnow() + timedelta(minutes=15)
     )
+    
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id")
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        unique=True,
+        nullable=False
     )
+
     user: Mapped["Users"] = relationship(
+        "Users",
         back_populates="codes"
     )
-    

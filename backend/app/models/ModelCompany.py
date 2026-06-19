@@ -1,6 +1,6 @@
 # Este modelo representa la tabla "company" en la base de datos, 
 # que almacena información sobre las empresas.
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -13,19 +13,55 @@ class Company(Base):
         primary_key=True, 
         default=uuid.uuid4
     )
+
     nameCompany: Mapped[str] = mapped_column(
         String(50), 
         nullable=False
     )
-    nit: Mapped[str] = mapped_column(
+
+    addressCompany: Mapped[str] = mapped_column(
+        String(100), nullable=False
+    )
+
+    CompanyNIT: Mapped[str] = mapped_column(
         String(50), 
         nullable=False
     )
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id")
+    CompanyNITDV: Mapped[str] = mapped_column(
+        String(1),
+        nullable=False
     )
-    
-    user: Mapped[list["Users"]] = relationship(
+
+    CompanyLogo: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True
+    )
+
+    CompanyBanner: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True
+    )
+
+    CompanyCertificate: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True
+    )   
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        unique=True,
+        nullable=False
+    )
+
+    user: Mapped["Users"] = relationship(
+        "Users",
         back_populates="company"
     )
+
+    products: Mapped["Product"] =  relationship(
+        "Product",
+        back_populates="company"
+    )
+

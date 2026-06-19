@@ -5,36 +5,108 @@
 # en la base de datos si aquel token existe y corresponde a el usuario
 from fastapi import Request
 from starlette.responses import JSONResponse
-from app.database.Connection import SessionLocal
-from app.models.ModelEventToken import EventToken
-from app.models.ModelUser import Users
-
+from app.services.authentication.JWTService import verify_token
 
 PUBLIC_ROUTES = [
-    "/user/login",
-    "/user/register",
-    "/user/verify-email",
-    "/user/forgot-password",
-    "/user/reset-password"       
+    "/auth/login-user",
+    "/auth/login-company",
+    "/auth/register-user",
+    "/auth/register-company",
+    "/auth/verify-email-user",
+    "/auth/forgot-password-user",
+    "/auth/reset-password-user",
+    "/auth/refresh",
+    "/auth/logout",
+    "/docs",
+    "/openapi.json"
 ]
 
+ROLES_PERMISSIONS_ROUTERS = {
+
+    "admin": [
+        "",
+        "/"
+    ],
+
+    "company": [
+        "/company/me",
+        ""
+    ],
+
+    "user": [
+        "",
+        "/"
+    ]
+    
+}
+
 async def auth_middleware(request: Request, call_next):
-    if request.url.path in PUBLIC_ROUTES:
+
+    if request.method == "OPTIONS":
         return await call_next(request)
 
-    token = request.headers.get("Authorization")
-    if not token:
-        return JSONResponse(status_code=401, content={"detalle": "Token de autenticación requerido"})
+    path = request.url.path
 
-    db = SessionLocal()
-    event_token = db.query(EventToken).filter(EventToken.token == token).first()
-    if not event_token:
-        return JSONResponse(status_code=401, content={"detalle": "token invalido"})
+    if path in PUBLIC_ROUTES:
+        return await call_next(request)
+    
+    auth_header = request.headers.get("Authorization")
 
-    user = db.query(Users).filter(Users.id == event_token.user_id).first()
-    if not user:
-        return JSONResponse(status_code=401, content={"detalle": "Usuario no encontrado"})
+    if not auth_header:
+        return JSONResponse(status_code=401, content={"detail": "Token requerido"})
+    
+    try:
+        scheme, token = auth_header.split()
 
-    request.state.user = user
-    response = await call_next(request)
-    return response
+        print("TOKEN RAW:", token)
+
+        if scheme.lower() != "bearer":
+            return JSONResponse(status_code=401, content={"detail": "Formato de autorizacion invalido"})
+        
+        payload =verify_token(token)
+
+        if not isinstance(payload, dict):
+            return JSONResponse(status_code=401, content={"detail": "invalid_token"})
+
+        print("DECODE RESULT:", payload)
+
+        if payload is None:
+            return JSONResponse(status_code=401, content={"detail": "Token invalido"})
+        
+        if payload.get("type") != "access":
+            return JSONResponse(status_code=401, content={"detail": "Access token requerido"})
+        
+        user_id = payload.get("sub")
+        role = payload.get("role")
+
+        if not user_id:
+            return JSONResponse(status_code=401, content={"detail": "Token invalido"})
+        
+        request.state.user_id = user_id
+        request.state.role = role
+
+        if role == "admin":
+            return await call_next(request)
+        
+        
+        allowed_routers = ROLES_PERMISSIONS_ROUTERS.get(role, [])
+
+        has_permission = any(
+            path.startswith(route)
+            for route in allowed_routers
+        )
+
+        if not has_permission:
+            return JSONResponse(status_code=401, content={"detail":"no tienes permiso para acceder a este recurso"})
+        
+        
+        return await call_next(request)
+    
+    except Exception as e:
+        
+        print("Auth Error", e)
+
+        return JSONResponse(status_code=401, content={"detail": "Token invalido"})
+
+    
+

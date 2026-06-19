@@ -2,22 +2,49 @@
 #  aplicacion de FastAPI del backend lubix, configurar las rutas y
 #  middlewares necesarios,.
 from fastapi import FastAPI
-from app.routers import UserRouters
+from contextlib import asynccontextmanager
+from app.database.Connection import SessionLocal
+from app.routers import AuthRouters
 from app.routers import HealthRouter
-# from app.database.connection import Base,engine
+from app.routers import CompanyRouter
 import app.models
 from app.middleware.AuthMiddleware import auth_middleware
 from app.middleware.CorsMiddleware import setup_cors
+from app.database.Connection import SessionLocal
+from app.utils.seed import run_seed
+from app.Config import config
 
-app = FastAPI()
-app.middleware("http")(auth_middleware)
+
+
+# =========================
+# LIFESPAN
+# =========================
+@asynccontextmanager
+async def lifespan(app):
+    db = SessionLocal()
+
+    if config.RUN_SEED:
+        run_seed(db)
+
+    db.close()
+    yield
+
+# =========================
+# APP
+# =========================
+app = FastAPI(lifespan=lifespan)
+
+# =========================
+# MIDDLEWARE
+# =========================
 setup_cors(app)
-#Base.metadata.create_all(bind=engine)
-app.include_router(UserRouters.router)
-app.include_router(HealthRouter.router)
+app.middleware("http")(auth_middleware)
 
-@app.get("/")
-def root():
-    return {"message": "Backend Lubix - API running successfully"}
+# =========================
+# ROUTERS
+# =========================
+app.include_router(AuthRouters.router)
+app.include_router(HealthRouter.router)
+app.include_router(CompanyRouter.router)
 
 

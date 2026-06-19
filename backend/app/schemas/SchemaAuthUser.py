@@ -2,15 +2,12 @@
 # incluyendo la creación de usuarios, verificación de correo electrónico, 
 # inicio de sesión,
 from pydantic import BaseModel, EmailStr, field_validator
-from app.models.ModelUser import RoleType
-from app.models.ModelEventToken import TokenType
 import re
 
 class createUser(BaseModel):
     fullName: str
     email: EmailStr
     password: str
-    role: RoleType = RoleType.user
     tell: str
     isActive: bool = True
     verified: bool = False
@@ -91,11 +88,12 @@ class ResetPassword(BaseModel):
         if not re.search(r'[0-9]', v):
             raise ValueError('la contraseña debe contener al menos un número')
         return v
-    
-class AddToken(BaseModel):
-    id: int
-    token: TokenType.access
 
-class DeleteToken(BaseModel):
-    id: int
-    token: TokenType.access
+class TokenResponse(BaseModel):
+    access_token:str
+    refresh_token: str
+    token_type: str = "bearer"
+    role: str
+
+class RefreshRequest(BaseModel):
+    old_refresh_token: str

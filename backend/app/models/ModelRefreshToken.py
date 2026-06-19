@@ -1,17 +1,12 @@
-from sqlalchemy import String, Enum, ForeignKey, DateTime
+from sqlalchemy import String, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from datetime import datetime, timedelta
+from datetime import datetime
 from app.database.Connection import Base
-from enum import Enum as typerEnum
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
-class TokenType(str, typerEnum):
-    access = "access"
-    refresh = "refresh"
-
-class EventToken(Base):
-    __tablename__ = "event_token"
+class RefreshToken(Base):
+    __tablename__ = "refreshToken"
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True, default=uuid.uuid4
     )
@@ -20,22 +15,28 @@ class EventToken(Base):
         String(255), nullable=False
     )
 
-    token_type: Mapped[TokenType] = mapped_column(
-        Enum(TokenType), nullable=False
+    revoked: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False
     )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow    
     )
+    
     expires_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=True
     )
     
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id")
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        nullable=False
     )
+
     user: Mapped["Users"] = relationship(
-        back_populates="event_token"
+        "Users",
+        back_populates="refresh_token"
     )
