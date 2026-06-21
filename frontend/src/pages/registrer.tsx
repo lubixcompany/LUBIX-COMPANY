@@ -94,7 +94,7 @@ export const Register = () => {
                 }
                 : form;
 
-            await api.post("/user/register", payload);
+            await api.post("/auth/register-user", payload);
             showPopup(
                 mode === "empresa" ? "Empresa registrada correctamente" : "Usuario registrado correctamente",
                 "success"
