@@ -1,6 +1,7 @@
 import  { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/navbar";
+import Footer from "../components/footer";
 
 const ofertas = [
   { 
@@ -44,21 +45,15 @@ function Bienvenida() {
       <section className="flex flex-col md:flex-row justify-between items-center px-8 md:px-16 py-20 min-h-[calc(100vh-80px)]" style={{ backgroundColor: "var(--color-bg)" }}>
         <div className="max-w-lg text-center md:text-left mr-8">
           <div className="text-accent mb-2 text-sm font-semibold uppercase tracking-wide">
-            🏷 Oferta Especial
+            Bienvenidos a Lubix
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight" style={{ color: "var(--color-text)" }}>
-            Mega Sale de Tecnología
+            Tienda de Tecnología
           </h1>
           <p className="text-lg text-muted mb-6">
-            Hasta <span className="font-bold text-accent">50% de descuento</span> en productos seleccionados
+            Y <span className="font-bold text-accent">50% de descuento</span> en productos seleccionados
           </p>
-          <Link
-            to="/ofertas"
-            className="inline-block text-white font-bold px-6 py-3 rounded-full shadow hover:shadow-lg transition"
-            style={{ backgroundColor: "var(--color-btn-primary)" }}
-          >
-            Ver ofertas
-          </Link>
+      
         </div>
 
         {/* Carrusel */}
@@ -71,13 +66,6 @@ function Bienvenida() {
           <div className={`w-full flex-1 flex flex-col items-center justify-center p-4 text-center ${ofertas[index].color}`}>
             <h2 className="text-xl font-bold mb-1">{ofertas[index].titulo}</h2>
             <p className="mb-3 text-sm">{ofertas[index].descripcion}</p>
-            <Link 
-              to="/ofertas"
-              className="text-emerald-700 font-semibold px-4 py-1.5 rounded-full shadow hover:bg-gray-200 transition text-sm"
-              style={{ backgroundColor: "white" }}
-            >
-              Comprar ahora
-            </Link>
           </div>
         </div>
       </section>
@@ -133,6 +121,7 @@ function Bienvenida() {
           </Link>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }

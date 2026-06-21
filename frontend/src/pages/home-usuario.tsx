@@ -1,6 +1,25 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import NavbarUsuario from "../components/navbaruser";
+import Footer from "../components/footer";
+import {DevicePhoneMobileIcon,ComputerDesktopIcon,SpeakerWaveIcon,CameraIcon,ClockIcon}from "@heroicons/react/24/outline" 
+
+  const GamepadIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className={props.className}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M6 9h2m-1-1v2m7-1h2m-1-1v2m-6 6h6a5 5 0 005-5V9a5 5 0 00-5-5H9a5 5 0 00-5 5v2a5 5 0 005 5z"
+    />
+  </svg>
+);
 
 const ofertas = [
   { 
@@ -51,13 +70,7 @@ const HomeUsuario: React.FC = () => {
           <p className="text-lg text-muted mb-6">
             Explora tus <span className="font-bold text-accent">compras, perfil y configuración</span> de manera rápida y sencilla.
           </p>
-          <Link
-            to="/ofertas"
-            className="inline-block text-white font-bold px-6 py-3 rounded-full shadow hover:shadow-lg transition"
-            style={{ backgroundColor: "var(--color-btn-primary)" }}
-          >
-            Ver Ofertas
-          </Link>
+        
         </div>
 
         {/* Carrusel de Ofertas */}
@@ -70,13 +83,7 @@ const HomeUsuario: React.FC = () => {
           <div className={`w-full flex-1 flex flex-col items-center justify-center p-4 text-center ${ofertas[index].color}`}>
             <h2 className="text-xl font-bold mb-1">{ofertas[index].titulo}</h2>
             <p className="mb-3 text-sm">{ofertas[index].descripcion}</p>
-            <Link 
-              to="/ofertas"
-              className="text-emerald-700 font-semibold px-4 py-1.5 rounded-full shadow hover:bg-gray-200 transition text-sm"
-              style={{ backgroundColor: "white" }}
-            >
-              Comprar ahora
-            </Link>
+          
           </div>
         </div>
       </section>
@@ -107,15 +114,17 @@ const HomeUsuario: React.FC = () => {
 
       {/* CATEGORÍAS PRINCIPALES */}
       <section className="card">
-        <h2 className="text-3xl font-bold mb-10 text-center">Categorías Principales</h2>
+        <h2 className="text-3xl font-bold mb-10 text-center">
+          Categorías Principales
+        </h2>
         <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
           {[
-            { nombre: "Computadoras", icono: "💻" },
-            { nombre: "Celulares", icono: "📱" },
-            { nombre: "Audio", icono: "🎧" },
-            { nombre: "Cámaras", icono: "📷" },
-            { nombre: "Wearables", icono: "⌚" },
-            { nombre: "Gaming", icono: "🎮" },
+            { nombre: "Computadoras", icono: <ComputerDesktopIcon className="w-10 h-10" /> },
+            { nombre: "Celulares", icono: <DevicePhoneMobileIcon className="w-10 h-10" /> },
+            { nombre: "Audio", icono: <SpeakerWaveIcon className="w-10 h-10" /> },
+            { nombre: "Cámaras", icono: <CameraIcon className="w-10 h-10" /> },
+            { nombre: "Wearables", icono: <ClockIcon className="w-10 h-10" /> },
+            { nombre: "Gaming", icono: <GamepadIcon className="w-10 h-10" /> },
           ].map((cat, i) => (
             <div key={i} className="card">
               <div className="text-4xl mb-3">{cat.icono}</div>
@@ -154,8 +163,10 @@ const HomeUsuario: React.FC = () => {
               </div>
             </div>
           ))}
+         </div>
+         <div className="grid md:grid-cols-3 gap-8 mt-12">
           
-        </div>
+          </div>
          <div className="grid md:grid-cols-3 gap-8">
           {[
             { nombre: "MacBook Pro 14\" M3 Pro", desc: "Laptop de alto rendimiento", precio: 9562500, antes: 11250000, descuento: "-15%", imagen: "/macbook.png" },
@@ -184,6 +195,7 @@ const HomeUsuario: React.FC = () => {
           ))}
         </div>
       </section>
+      <Footer />
     </div>
   );
 };
