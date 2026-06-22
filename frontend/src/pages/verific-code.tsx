@@ -30,13 +30,13 @@ const VerificationCode: React.FC = () => {
   }, []);
 
   const handleChange = (value: string, index: number) => {
-    if (!/^[0-9]?$/.test(value)) return;
+    const digit = value.replace(/\D/g, "").slice(-1);
 
     const newCode = [...code];
-    newCode[index] = value;
+    newCode[index] = digit;
     setCode(newCode);
 
-    if (value && index < 5) {
+    if (digit && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -45,7 +45,7 @@ const VerificationCode: React.FC = () => {
     if (e.key === "Backspace" && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
-    
+
     if (e.key === "Enter" && isValidCode) {
       handleSubmit(e);
     }
@@ -55,12 +55,12 @@ const VerificationCode: React.FC = () => {
     e.preventDefault();
     const paste = e.clipboardData.getData("text").replace(/\D/g, "");
     const pasteArray = paste.slice(0, 6).split("");
-    
+
     const newCode = [...code];
     pasteArray.forEach((digit, i) => {
       if (i < 6) newCode[i] = digit;
     });
-    
+
     setCode(newCode);
   };
 
@@ -105,10 +105,10 @@ const VerificationCode: React.FC = () => {
     }
 
     setLoading(true);
-    
+
     try {
       const response = await api.post<VerifyEmailResponse>(
-        "/user/verify-email", 
+        "/user/verify-email",
         {
           email,
           code: fullCode
@@ -116,11 +116,11 @@ const VerificationCode: React.FC = () => {
       );
 
       showMessage("¡Verificado!", "success");
-      
+
       setTimeout(() => {
         navigate("/login", {
-          state: { 
-            email, 
+          state: {
+            email,
             verified: true,
             token: response.data.data?.token
           }
@@ -130,7 +130,7 @@ const VerificationCode: React.FC = () => {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorDetail = error.response?.data;
-        
+
         if (errorDetail?.detail) {
           showMessage(errorDetail.detail, "error");
         } else {
@@ -139,7 +139,7 @@ const VerificationCode: React.FC = () => {
       } else {
         showMessage("Error de conexión", "error");
       }
-      
+
       setCode(Array(6).fill(""));
       inputRefs.current[0]?.focus();
     } finally {
@@ -162,7 +162,7 @@ const VerificationCode: React.FC = () => {
       {/* Contenedor Principal */}
       <div className="page-container flex items-center justify-center p-3 sm:p-4">
         <div className="w-full max-w-sm">
-          
+
           {/* Logo */}
           <div className="text-center mb-4 sm:mb-5">
             <h1 className="text-accent text-2xl sm:text-3xl font-black drop-shadow-sm mb-1">
@@ -174,11 +174,11 @@ const VerificationCode: React.FC = () => {
           </div>
 
           {/* Formulario */}
-          <form 
-            onSubmit={handleSubmit} 
+          <form
+            onSubmit={handleSubmit}
             className="card-form space-y-3"
           >
-            
+
             {/* Email */}
             <div className="mb-3">
               <label className="label-base">
@@ -205,6 +205,7 @@ const VerificationCode: React.FC = () => {
                     key={i}
                     ref={(el) => { inputRefs.current[i] = el; }}
                     type="text"
+                    inputMode="numeric"
                     maxLength={1}
                     value={digit}
                     onChange={(e) => handleChange(e.target.value, i)}
@@ -214,7 +215,8 @@ const VerificationCode: React.FC = () => {
                     style={{
                       backgroundColor: "white",
                       borderColor: "var(--color-border)",
-                      border: "1px solid var(--color-border)"
+                      border: "1px solid var(--color-border)",
+                      color: "#000000",
                     }}
                   />
                 ))}
@@ -260,8 +262,8 @@ const VerificationCode: React.FC = () => {
 
           {/* Link */}
           <p className="mt-3 text-center">
-            <Link 
-              to="/register" 
+            <Link
+              to="/register"
               className="text-accent text-xs font-medium hover:underline transition-colors"
             >
               Cambiar email
