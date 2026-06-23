@@ -14,7 +14,7 @@ RUN pip install uv
 COPY . .
 
 # Install dependencies with uv
-RUN uv pip install --system -e .
+RUN uv pip install --system -r requirements.txt
 
 EXPOSE 8000
 
