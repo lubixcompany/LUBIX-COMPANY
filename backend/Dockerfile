@@ -28,6 +28,7 @@ RUN pip install --no-cache-dir \
     python-dotenv==1.2.2 \
     python-jose==3.5.0 \
     python-multipart>=0.0.27 \
+    requests>=2.33.1 \
     sqlalchemy==2.0.48 \
     uvicorn==0.41.0
 
