@@ -2,7 +2,7 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-# Install build dependencies for Python packages
+# Install build dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
@@ -12,8 +12,9 @@ RUN apt-get update && apt-get install -y \
 # Copy project files
 COPY . .
 
-# Install dependencies with pip
-RUN pip install --no-cache-dir -r requirements.txt
+# Install pip-tools and build dependencies from pyproject.toml
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -e .
 
 EXPOSE 8000
 
