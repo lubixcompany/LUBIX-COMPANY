@@ -31,12 +31,12 @@ services:
 
   backend:
     build:
-      context: ./lubix-backend
+      context: ./backend
       dockerfile: Dockerfile
     ports:
       - "8001:8000"
     volumes:
-      - ./lubix-backend:/app
+      - ./backend:/app
     depends_on:
       - postgres
     env_file:
