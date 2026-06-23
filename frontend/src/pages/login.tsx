@@ -36,9 +36,13 @@ const Login: React.FC = () => {
 
     try {
       const payload: LoginRequest = { email: email.trim(), password };
-      const response = await api.post<LoginResponse>("/user/login", payload);
+      const response = await api.post<LoginResponse>("/auth/login-user", payload);
 
       const data = response.data;
+
+      // Guardar tokens en localStorage
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
 
       login(data.access_token, {
         id: data.id,
@@ -51,7 +55,12 @@ const Login: React.FC = () => {
 
       showMessage(`¡Bienvenido ${data.Nombre}!`, "success");
 
-      setTimeout(() => navigate("/"), 1000);
+        if (data.role === "empresa") {
+        setTimeout(() => navigate("/home-empresa"), 1000);
+      } else {
+        setTimeout(() => navigate("/home-usuario"), 1000);
+      }
+
 
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -64,7 +73,6 @@ const Login: React.FC = () => {
 
   return (
     <>
-      {/* Popup superior */}
       {message && (
         <div className={messageType === "success" ? "popup-success" : "popup-error"}>
           <div className="flex items-center gap-1.5">
@@ -74,11 +82,8 @@ const Login: React.FC = () => {
         </div>
       )}
 
-      {/* Contenedor Principal */}
       <div className="page-container flex items-center justify-center p-3 sm:p-4">
-        
         <div className="w-full max-w-sm">
-          {/* Logo */}
           <div className="text-center mb-4 sm:mb-5">
             <h1 className="text-accent text-2xl sm:text-3xl font-black drop-shadow-sm mb-1">
               Lubix
@@ -88,17 +93,9 @@ const Login: React.FC = () => {
             </p>
           </div>
 
-          {/* Formulario */}
-          <form 
-            onSubmit={handleSubmit} 
-            className="card-form space-y-3 sm:space-y-4"
-          >
-            
-            {/* Email */}
+          <form onSubmit={handleSubmit} className="card-form space-y-3 sm:space-y-4">
             <div className="mb-3 sm:mb-4">
-              <label className="label-base">
-                Email
-              </label>
+              <label className="label-base">Email</label>
               <input
                 type="email"
                 value={email}
@@ -109,11 +106,8 @@ const Login: React.FC = () => {
               />
             </div>
 
-            {/* Password */}
             <div className="mb-4 sm:mb-5">
-              <label className="label-base">
-                Contraseña
-              </label>
+              <label className="label-base">Contraseña</label>
               <input
                 type="password"
                 value={password}
@@ -124,12 +118,7 @@ const Login: React.FC = () => {
               />
             </div>
 
-            {/* Botón */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary"
-            >
+            <button type="submit" disabled={loading} className="btn-primary">
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -140,13 +129,11 @@ const Login: React.FC = () => {
               )}
             </button>
 
-            
-            {/* Links */}
             <div className="pt-4 divider text-center">
               <p className="text-muted text-xs sm:text-sm">
-                ¿No tienes cuenta?{' '}
-                <Link 
-                  to="/register" 
+                ¿No tienes cuenta?{" "}
+                <Link
+                  to="/register"
                   className="text-accent hover:underline font-semibold text-xs sm:text-sm transition-colors"
                 >
                   Regístrate
@@ -155,9 +142,9 @@ const Login: React.FC = () => {
             </div>
             <div className="pt-4 divider text-center">
               <p className="text-muted text-xs sm:text-sm">
-                ¿Olvidaste tu contraseña?{' '}
-                <Link 
-                  to="/recover" 
+                ¿Olvidaste tu contraseña?{" "}
+                <Link
+                  to="/recover"
                   className="text-accent hover:underline font-semibold text-xs sm:text-sm transition-colors"
                 >
                   Recuperar
@@ -170,5 +157,5 @@ const Login: React.FC = () => {
     </>
   );
 };
-  
+
 export default Login;

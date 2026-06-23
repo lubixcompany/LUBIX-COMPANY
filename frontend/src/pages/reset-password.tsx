@@ -30,7 +30,7 @@ const RecoverPassword: React.FC = () => {
     setLoading(true);
 
     try {
-      await api.post("/user/forgot-password", {
+      await api.post("/auth/forgot-password-user", {
         email: email.trim(),
       });
 
