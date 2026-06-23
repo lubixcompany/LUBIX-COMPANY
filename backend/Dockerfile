@@ -2,7 +2,13 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-# Copy project files first
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy project files
 COPY . .
 
 # Install dependencies with pip
