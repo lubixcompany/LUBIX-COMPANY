@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userType, setUserType] = useState<"user" | "company">("user");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "">("");
@@ -36,7 +37,10 @@ const Login: React.FC = () => {
 
     try {
       const payload: LoginRequest = { email: email.trim(), password };
-      const response = await api.post<LoginResponse>("/auth/login-user", payload);
+      
+      // Seleccionar el endpoint según el tipo de usuario
+      const endpoint = userType === "company" ? "/auth/login-company" : "/auth/login-user";
+      const response = await api.post<LoginResponse>(endpoint, payload);
 
       const data = response.data;
 
@@ -48,14 +52,15 @@ const Login: React.FC = () => {
         id: data.id,
         name: data.Nombre,
         email: data.email,
-        role: data.role,
+        role: data.role || userType,
       });
 
       api.defaults.headers.common["Authorization"] = `Bearer ${data.access_token}`;
 
       showMessage(`¡Bienvenido ${data.Nombre}!`, "success");
 
-        if (data.role === "empresa") {
+      // Redirigir según el tipo de usuario
+      if (userType === "company" || data.role === "empresa") {
         setTimeout(() => navigate("/home-empresa"), 1000);
       } else {
         setTimeout(() => navigate("/home-usuario"), 1000);
@@ -91,6 +96,32 @@ const Login: React.FC = () => {
             <p className="text-muted text-xs sm:text-sm font-light tracking-wide">
               Inicia sesión
             </p>
+          </div>
+
+          {/* Selector de tipo de usuario */}
+          <div className="mb-4 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setUserType("user")}
+              className={`flex-1 py-2 px-3 rounded-lg font-semibold transition text-xs sm:text-sm ${
+                userType === "user"
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              👤 Usuario
+            </button>
+            <button
+              type="button"
+              onClick={() => setUserType("company")}
+              className={`flex-1 py-2 px-3 rounded-lg font-semibold transition text-xs sm:text-sm ${
+                userType === "company"
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              🏢 Empresa
+            </button>
           </div>
 
           <form onSubmit={handleSubmit} className="card-form space-y-3 sm:space-y-4">
@@ -133,7 +164,7 @@ const Login: React.FC = () => {
               <p className="text-muted text-xs sm:text-sm">
                 ¿No tienes cuenta?{" "}
                 <Link
-                  to="/register"
+                  to={userType === "company" ? "/registro-empresa" : "/register"}
                   className="text-accent hover:underline font-semibold text-xs sm:text-sm transition-colors"
                 >
                   Regístrate

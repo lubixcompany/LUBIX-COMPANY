@@ -1,10 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
-import { UserCircleIcon, Cog6ToothIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, ChartBarIcon, ShoppingBagIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
-export default function NavbarUsuario() {
+export default function NavbarEmpresa() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -19,15 +19,17 @@ export default function NavbarUsuario() {
 
   return (
     <div className="flex items-center justify-between px-6 py-4 bg-[#162238] w-full">
-      <div className="text-green-500 text-2xl font-bold">Lubix</div>
+      <Link to="/home-empresa" className="text-green-500 text-2xl font-bold hover:text-green-400 transition">
+        Lubix
+      </Link>
 
       <div className="flex w-[500px] bg-[#1c2a4a] rounded-full overflow-hidden">
         <input
           type="text"
-          placeholder="Buscar productos..."
+          placeholder="Buscar en tu tienda..."
           className="flex-1 px-4 py-2 bg-transparent text-white placeholder-gray-400 focus:outline-none"
         />
-        <button className="bg-green-500 px-5 text-white">🔍</button>
+        <button className="bg-green-500 px-5 text-white hover:bg-green-600 transition">🔍</button>
       </div>
 
       <div className="flex items-center gap-6 text-white">
@@ -61,14 +63,14 @@ export default function NavbarUsuario() {
           </svg>
         </button>
 
-        <Link to="/carrito" className="flex items-center gap-1 hover:text-green-400 transition relative">
-          <ShoppingCartIcon className="w-5 h-5" />
-          <span>Carrito</span>
+        <Link to="/empresa" className="flex items-center gap-1 hover:text-green-400 transition">
+          <ChartBarIcon className="w-5 h-5" />
+          <span>Dashboard</span>
         </Link>
 
-        <Link to="/configuracion" className="flex items-center gap-1 hover:text-green-400 transition">
-          <Cog6ToothIcon className="w-5 h-5" />
-          <span>Configuración</span>
+        <Link to="/empresa/productos" className="flex items-center gap-1 hover:text-green-400 transition">
+          <ShoppingBagIcon className="w-5 h-5" />
+          <span>Productos</span>
         </Link>
 
         {user && (
@@ -88,13 +90,20 @@ export default function NavbarUsuario() {
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-[#1c2a4a] rounded shadow-lg py-2 z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-[#1c2a4a] rounded shadow-lg py-2 z-50">
                 <Link
-                  to="dashboard-usuario"
+                  to="/dashboard-empresa"
                   className="block px-4 py-2 text-white hover:bg-green-500 transition"
                   onClick={() => setMenuOpen(false)}
                 >
-                  Ver Perfil
+                  Perfil de Empresa
+                </Link>
+                <Link
+                  to="/dashboard-empresa"
+                  className="block px-4 py-2 text-white hover:bg-green-500 transition"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Configuración
                 </Link>
                 <button
                   onClick={handleLogout}

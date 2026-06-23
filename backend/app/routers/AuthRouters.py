@@ -86,10 +86,6 @@ def login_user(user: userLogin, database: Session = Depends(get_db)):
 
 @router.post("/login-company")
 def login_company(company: LoginCompany,database: Session = Depends(get_db)):
-
-    print("NIT ", company.companyNIT)
-    print("NIT ", company.companyPassword)
-
     return login_company_service(company, database)
 
 @router.post("/forgot-password-user")

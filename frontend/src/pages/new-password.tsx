@@ -69,7 +69,7 @@ const NewPassword: React.FC = () => {
     try {
       console.log("🔥 Restableciendo:", { email: email.trim(), code: code.trim() });
       
-      await api.post("/user/reset-password", {
+      await api.post("/auth/reset-password-user", {
         email: email.trim(),
         code: code.trim(),
         new_password: password,

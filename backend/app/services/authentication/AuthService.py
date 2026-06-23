@@ -166,17 +166,26 @@ def login_user_service(user: userLogin, database: Session):
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
-        role=search_user.role.name
+        role=search_user.role.name,
+        id=str(search_user.id),
+        Nombre=search_user.fullName,
+        email=search_user.email
     )
 
 def login_company_service(company: LoginCompany, database: Session):
-    search_company = database.query(Users).join(Company, Users.id == Company.user_id).filter(Company.CompanyNIT == company.companyNIT).first()
+    search_company = database.query(Users).join(Company, Users.id == Company.user_id).filter(Users.email == company.email).first()
     
     if not search_company:
-        raise HTTPException(status_code=400, detail="NIT o contraseña incorrectos")
+        raise HTTPException(status_code=400, detail="Correo o contraseña incorrectos")
     
-    if not verify_password(company.companyPassword, search_company.hashed_password):
-        raise HTTPException(status_code=400, detail="contraseña incorrectos")
+    if not verify_password(company.password, search_company.hashed_password):
+        raise HTTPException(status_code=400, detail="Contraseña incorrecta")
+    
+    if not search_company.verified:
+        create_code_and_send_code(database, search_company.id, search_company.email, code_type="verifyEmail")
+        return {
+            "message": "Tu correo electrónico no ha sido verificado. Se ha enviado un nuevo código de verificación a tu correo electrónico."
+        }
     
     access_token = create_access_token(
         user_id=str(search_company.id),
@@ -190,7 +199,10 @@ def login_company_service(company: LoginCompany, database: Session):
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
-        role=search_company.role.name
+        role=search_company.role.name,
+        id=str(search_company.id),
+        Nombre=search_company.fullName,
+        email=search_company.email
     )
 
 def forgot_password_service(user: forgotPassword, database: Session):

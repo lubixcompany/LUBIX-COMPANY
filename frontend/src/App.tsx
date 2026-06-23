@@ -7,9 +7,9 @@ import VerificationCode from "./pages/verific-code";
 import NewPassword from "./pages/new-password";
 import Home from "./pages/Home"; 
 import HomeUsuario from "./pages/home-usuario";
+import HomeEmpresa from "./pages/home-empresa";
 import RegistroEmpresa from "./pages/RegistroEmpresa";
-import Dashboard_Usuario from "./pages/Dashboard_Usuario";
-import Dashboard_Empresa from "./pages/Dashboard_Empresa";
+import DashboardUsuario from "./pages/dashboard-user";
 
 
 function App() {
@@ -22,9 +22,9 @@ function App() {
       <Route path="/register/VerifyEmailPage" element={<VerificationCode />} />
       <Route path="/new-password" element={<NewPassword />} />
       <Route path="/home-usuario" element={<HomeUsuario />} />
+      <Route path="/home-empresa" element={<HomeEmpresa />} />
       <Route path="/registro-empresa" element={<RegistroEmpresa />} />
-      <Route path="/usuario" element={<Dashboard_Usuario />} />
-        <Route path="/empresa" element={<Dashboard_Empresa />} />
+      <Route path="/dashboard-usuario" element={<DashboardUsuario />} />
       
     </Routes>
   );

@@ -57,5 +57,5 @@ class createCompany(BaseModel):
 
 
 class LoginCompany(BaseModel):
-    companyNIT: str
-    companyPassword: str
+    email: str
+    password: str
