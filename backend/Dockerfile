@@ -14,7 +14,7 @@ RUN pip install uv
 COPY . .
 
 # Install dependencies with uv
-RUN uv pip install --system -r <(uv pip compile pyproject.toml -o -)
+RUN uv pip install --system -e .
 
 EXPOSE 8000
 
