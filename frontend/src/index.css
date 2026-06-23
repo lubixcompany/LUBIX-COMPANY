@@ -240,3 +240,5 @@
    Estilos Personalizados Adicionales
    ======================================== */
 
+/* Nota: Los dashboards usan Tailwind CSS + variables CSS
+   directamente en los TSX, sin archivos CSS separados */
