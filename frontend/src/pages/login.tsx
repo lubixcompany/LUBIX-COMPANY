@@ -49,10 +49,10 @@ const Login: React.FC = () => {
       localStorage.setItem("refresh_token", data.refresh_token);
 
       login(data.access_token, {
-        id: data.id,
+        id: String(data.id),
         name: data.Nombre,
         email: data.email,
-        role: data.role || userType,
+        role: (data.role || userType) as "user" | "empresa" | "admin",
       });
 
       api.defaults.headers.common["Authorization"] = `Bearer ${data.access_token}`;
@@ -69,7 +69,22 @@ const Login: React.FC = () => {
 
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
-        showMessage(error.response?.data?.detail || "Error de login", "error");
+        // Handle different error response formats
+        let errorMessage = "Error de login";
+        
+        const detail = error.response?.data?.detail;
+        
+        if (typeof detail === "string") {
+          errorMessage = detail;
+        } else if (Array.isArray(detail)) {
+          // If detail is an array of validation errors, extract first message
+          errorMessage = detail[0]?.msg || "Error de validación";
+        } else if (detail && typeof detail === "object" && "msg" in detail) {
+          // If detail is a single validation error object
+          errorMessage = (detail as { msg: string }).msg;
+        }
+        
+        showMessage(errorMessage, "error");
       }
     } finally {
       setLoading(false);

@@ -1,6 +1,5 @@
 # Este esquema define los modelos de datos para la autenticación de empresas,
-from pydantic import BaseModel, EmailStr, field_validator
-import re
+from pydantic import BaseModel, field_validator
 
 class createCompany(BaseModel):
     companyName: str
@@ -57,5 +56,5 @@ class createCompany(BaseModel):
 
 
 class LoginCompany(BaseModel):
-    email: str
-    password: str
+    companyNIT: str
+    companyPassword: str

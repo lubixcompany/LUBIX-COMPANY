@@ -82,12 +82,23 @@ const NewPassword: React.FC = () => {
       }, 1500);
 
     } catch (err: unknown) {
-      console.error("❌ Error reset:", err);
+      console.error("Error reset:", err);
       
       if (axios.isAxiosError(err)) {
-        const errorData = err.response?.data;
-        const errorMsg = errorData?.detail || errorData?.message || "Código inválido";
-        showMessage(errorMsg, "error");
+        // Handle different error response formats
+        let errorMessage = "Código inválido";
+        
+        const detail = err.response?.data?.detail;
+        
+        if (typeof detail === "string") {
+          errorMessage = detail;
+        } else if (Array.isArray(detail)) {
+          errorMessage = detail[0]?.msg || "Error de validación";
+        } else if (detail && typeof detail === "object" && "msg" in detail) {
+          errorMessage = (detail as { msg: string }).msg;
+        }
+        
+        showMessage(errorMessage, "error");
       } else {
         showMessage("Error de conexión", "error");
       }

@@ -117,10 +117,22 @@ export const Register = () => {
             }, 2000);
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                showPopup(
-                    error.response?.data?.detail || (mode === "empresa" ? "No se pudo registrar la empresa" : "El usuario ya está registrado"),
-                    "error"
-                );
+                // Handle different error response formats
+                let errorMessage = mode === "empresa" ? "No se pudo registrar la empresa" : "El usuario ya está registrado";
+                
+                const detail = error.response?.data?.detail;
+                
+                if (typeof detail === "string") {
+                  errorMessage = detail;
+                } else if (Array.isArray(detail)) {
+                  // If detail is an array of validation errors, extract first message
+                  errorMessage = detail[0]?.msg || "Error de validación";
+                } else if (detail && typeof detail === "object" && "msg" in detail) {
+                  // If detail is a single validation error object
+                  errorMessage = (detail as { msg: string }).msg;
+                }
+                
+                showPopup(errorMessage, "error");
             } else {
                 showPopup("Error desconocido", "error");
             }

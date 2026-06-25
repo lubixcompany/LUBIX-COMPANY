@@ -14,9 +14,11 @@ from app.schemas.SchemaAuthUser import (
     TokenResponse,
     RefreshRequest
 )
+
 from app.services.authentication.JWTService import create_access_token, create_refresh_token, verify_token
 from app.schemas.SchemaAuthCompany import createCompany, LoginCompany
 from sqlalchemy.orm import Session
+from sqlalchemy import exists
 from app.utils.Security import hash_password, verify_password
 from app.services.email.SaveAndGenerateCode import create_code_and_send_code, verify_code
 from app.services.email.template.EmailRegisterCompany import EmailRegisterCompany
@@ -24,11 +26,10 @@ from app.services.email.template.EmailRegisterCompany import EmailRegisterCompan
 def register_user_service(user: createUser, database: Session):
     user_role = database.query(Role).filter(Role.name == "user").first()
     exists_user = database.query(Users).filter(Users.email == user.email).first()
-
-    if exists_user:
-        raise HTTPException(status_code=409, detail="correo en uso")
     
     try:
+        if exists_user:
+            raise HTTPException(status_code=409, detail="correo en uso")
 
         hashed_password = hash_password(user.password)
         new_user = Users(
@@ -56,28 +57,39 @@ def register_user_service(user: createUser, database: Session):
         print("ERROR:",e)
         raise HTTPException(status_code=500, detail="Error al crear cuenta")
 
-def register_company_service(user: createUser, company: createCompany, certificate_result: str, database: Session):
-    company_role = database.query(Role).filter(Role.name == "company").first()
-    exists_NIT = database.query(Company).filter(Company.CompanyNIT == company.companyNIT).first()
-    exists_email = database.query(Users).filter(Users.email == user.email).first()
 
-    if not company_role:
-        raise HTTPException(status_code=409, detail="Ups no hay rol para empresa")
-    
-    if exists_NIT:
-        raise HTTPException(status_code=409, detail="NIT en uso")
-    
-    if exists_email:
-        raise HTTPException(status_code=409, detail="Correo en uso")
-    
+def register_company_service(user: createUser, company: createCompany, certificate, nas, database: Session):
+    role_exists = database.query(Role).filter(Role.name == "company").first()
+    nit_exists = database.query(exists().where(Company.CompanyNIT == company.companyNIT)).scalar()
+    email_exists = database.query(exists().where(Users.email == user.email)).scalar()
+
+    uploaded = False
+    #Direcctorio para minio
+    path = f"companies/{company.companyNIT}/certificates/"
 
     try:
+
+        if not role_exists:
+            raise HTTPException(status_code=409, detail="Ups no hay rol para empresa")
+    
+        if nit_exists:
+            raise HTTPException(status_code=409, detail="NIT en uso")
+    
+        if email_exists:
+            raise HTTPException(status_code=409, detail="Correo en uso")
+        
+        if certificate:
+            nas.upload_file(certificate, path)
+            uploaded = True
+            print("Certificado subido correctamente", uploaded)
+        
         hashed_password = hash_password(user.password)
+        
         new_user = Users(
             fullName = user.fullName,
             email = user.email,
             hashed_password = hashed_password,
-            role_id = company_role.id,
+            role_id = role_exists.id,
             tell = user.tell,
             isActive = user.isActive,
             verified = user.verified,
@@ -85,6 +97,9 @@ def register_company_service(user: createUser, company: createCompany, certifica
 
         database.add(new_user)
         database.flush()
+        
+        if certificate:
+            nas.upload_file(certificate, path)
 
         new_company = Company(
             user_id = new_user.id,
@@ -94,27 +109,46 @@ def register_company_service(user: createUser, company: createCompany, certifica
             CompanyNITDV = company.companyNITDV,
             CompanyLogo = company.companyLogo,
             CompanyBanner = company.companyBanner,
-            CompanyCertificate = certificate_result["path"],
+            CompanyCertificate = path,
         )
 
         database.add(new_company)
         database.commit()
         database.refresh(new_company)
-        EmailRegisterCompany(user.email, company.companyName, company.companyNIT)
+
+        try:
+            EmailRegisterCompany(
+            user.email,
+            company.companyName,
+            company.companyNIT
+        )
+            
+        except Exception as email_error:
+            print("Error enviando correo:", email_error)
 
         return {
             "message": "Empresa registrada correctamente. espera que el equipo de Lubix se ponga en contacto contigo para verificar tu empresa y activar tu cuenta.",
             "certificate_url": new_company.CompanyCertificate,
             "company_name": new_company.nameCompany,
-            "company_nit": new_company.CompanyNIT,
-            "certificate": certificate_result["path"]
+            "company_nit": new_company.CompanyNIT
         }
     
     except Exception as e:
         database.rollback()
-        print("ERROR",e)
 
-        raise HTTPException(status_code=500, detail="Error al crear cuenta empresarial")
+        if uploaded:
+
+            try:
+                nas.delete_file(path)
+            
+            except Exception:
+                pass
+
+        print("ERROR:", e)
+        raise HTTPException(
+            status_code=500,
+            detail="Error al crear cuenta empresarial"
+        )
 
 def verify_email_service(code: verifyEmail, database: Session):
     user = database.query(Users).filter(Users.email == code.email).first()
@@ -166,26 +200,17 @@ def login_user_service(user: userLogin, database: Session):
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
-        role=search_user.role.name,
-        id=str(search_user.id),
-        Nombre=search_user.fullName,
-        email=search_user.email
+        role=search_user.role.name
     )
 
 def login_company_service(company: LoginCompany, database: Session):
-    search_company = database.query(Users).join(Company, Users.id == Company.user_id).filter(Users.email == company.email).first()
+    search_company = database.query(Users).join(Company, Users.id == Company.user_id).filter(Company.CompanyNIT == company.companyNIT).first()
     
     if not search_company:
-        raise HTTPException(status_code=400, detail="Correo o contraseña incorrectos")
+        raise HTTPException(status_code=400, detail="NIT o contraseña incorrectos")
     
-    if not verify_password(company.password, search_company.hashed_password):
-        raise HTTPException(status_code=400, detail="Contraseña incorrecta")
-    
-    if not search_company.verified:
-        create_code_and_send_code(database, search_company.id, search_company.email, code_type="verifyEmail")
-        return {
-            "message": "Tu correo electrónico no ha sido verificado. Se ha enviado un nuevo código de verificación a tu correo electrónico."
-        }
+    if not verify_password(company.companyPassword, search_company.hashed_password):
+        raise HTTPException(status_code=400, detail="contraseña incorrectos")
     
     access_token = create_access_token(
         user_id=str(search_company.id),
@@ -199,10 +224,7 @@ def login_company_service(company: LoginCompany, database: Session):
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
-        role=search_company.role.name,
-        id=str(search_company.id),
-        Nombre=search_company.fullName,
-        email=search_company.email
+        role=search_company.role.name
     )
 
 def forgot_password_service(user: forgotPassword, database: Session):

@@ -5,11 +5,9 @@
  * Retorna: "bg-white dark:bg-gray-950"
  */
 
-import { useTheme } from "../context/ThemeContext";
 import { colors } from "./colors";
 
 export function useThemeColor(colorKey: keyof typeof colors.light): string {
-  const { theme } = useTheme();
   
   const lightColor = colors.light[colorKey];
   const darkColor = colors.dark[colorKey];

@@ -1,7 +1,7 @@
 # Este router se encarga de manejar las rutas relacionadas 
 # con la autenticación de usuarios, incluyendo registro, inicio de sesión,
 # verificación de correo electrónico, recuperación de contraseña y cierre de sesión.
-from fastapi import APIRouter,Depends, UploadFile, File, Form, requests
+from fastapi import APIRouter,Depends, UploadFile, File, Form
 from app.services.authentication.AuthService import (
     register_user_service,
     register_company_service,
@@ -24,10 +24,10 @@ from app.schemas.SchemaAuthUser import (
     RefreshRequest
 )
 from app.schemas.SchemaAuthCompany import createCompany, LoginCompany
-from app.services.NasService import subir
 
-from app.services.authentication.JWTService import verify_token
 from app.Config import config
+
+from app.services.NasService import NasService, get_nas_service
 
 router = APIRouter(
     prefix=("/auth"),   
@@ -52,6 +52,7 @@ def registerCompany(
     companyNIT: str = Form(...),
     companyNITDV: str = Form(...),
     certificate: UploadFile = File(...),
+    nas: NasService = Depends(get_nas_service),
     database: Session = Depends(get_db)):
 
     user = createUser(
@@ -67,10 +68,14 @@ def registerCompany(
         companyNIT=companyNIT,
         companyNITDV=companyNITDV
     )
-    path = f"companies/{companyNIT}/certificates/"
-    certificate_result = subir.upload_file(certificate, path)
-    
-    return register_company_service(user,company, certificate_result, database)
+
+    return register_company_service(
+        user=user,
+        company=company, 
+        certificate=certificate,
+        nas=nas, 
+        database=database
+    )
 
 @router.post("/verify-email-user")
 def verify_email(code: verifyEmail, database: Session = Depends(get_db)):
@@ -80,12 +85,14 @@ def verify_email(code: verifyEmail, database: Session = Depends(get_db)):
 @router.post("/login-user")
 def login_user(user: userLogin, database: Session = Depends(get_db)):
     
-   
-    
     return login_user_service(user, database)
 
 @router.post("/login-company")
 def login_company(company: LoginCompany,database: Session = Depends(get_db)):
+
+    print("NIT ", company.companyNIT)
+    print("NIT ", company.companyPassword)
+
     return login_company_service(company, database)
 
 @router.post("/forgot-password-user")

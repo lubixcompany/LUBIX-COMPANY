@@ -78,10 +78,20 @@ const VerificationCode: React.FC = () => {
       inputRefs.current[0]?.focus();
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        showMessage(
-          error.response?.data?.detail || "Error al reenviar",
-          "error"
-        );
+        // Handle different error response formats
+        let errorMessage = "Error al reenviar";
+        
+        const detail = error.response?.data?.detail;
+        
+        if (typeof detail === "string") {
+          errorMessage = detail;
+        } else if (Array.isArray(detail)) {
+          errorMessage = detail[0]?.msg || "Error de validación";
+        } else if (detail && typeof detail === "object" && "msg" in detail) {
+          errorMessage = (detail as { msg: string }).msg;
+        }
+        
+        showMessage(errorMessage, "error");
       } else {
         showMessage("Error de conexión", "error");
       }
@@ -129,13 +139,20 @@ const VerificationCode: React.FC = () => {
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const errorDetail = error.response?.data;
-
-        if (errorDetail?.detail) {
-          showMessage(errorDetail.detail, "error");
-        } else {
-          showMessage("Código inválido", "error");
+        // Handle different error response formats
+        let errorMessage = "Código inválido";
+        
+        const detail = error.response?.data?.detail;
+        
+        if (typeof detail === "string") {
+          errorMessage = detail;
+        } else if (Array.isArray(detail)) {
+          errorMessage = detail[0]?.msg || "Error de validación";
+        } else if (detail && typeof detail === "object" && "msg" in detail) {
+          errorMessage = (detail as { msg: string }).msg;
         }
+        
+        showMessage(errorMessage, "error");
       } else {
         showMessage("Error de conexión", "error");
       }

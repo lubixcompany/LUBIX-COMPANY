@@ -2,6 +2,7 @@ import uuid
 from sqlalchemy.orm import Session
 from app.models.ModelRole import Role
 from app.models.ModelUser import Users
+from app.models.ModelProduct import Catalog
 from app.utils.Security import hash_password
 from app.Config import config
 
@@ -15,6 +16,19 @@ def seed_roles(db: Session):
             db.add(Role(name=role_name))
 
     db.commit()
+
+
+def seed_catalog(db: Session):
+    catalog_product = ["Computadoras", "Celulares", "Audio", "Cámaras", "Reloj inteligente", "Gaming"]
+
+    for catalog_name in catalog_product:
+        exists = db.query(Catalog).filter(Catalog.name == catalog_name).first()
+
+        if not exists:
+            db.add(Catalog(name=catalog_name))
+
+    db.commit()
+
 
 def seed_admin(db: Session):
     admin_role = db.query(Role).filter(Role.name == "admin").first()
@@ -45,4 +59,5 @@ def seed_admin(db: Session):
 
 def run_seed(db: Session):
     seed_roles(db)
+    seed_catalog(db)
     seed_admin(db)

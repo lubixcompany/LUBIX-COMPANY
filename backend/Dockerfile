@@ -1,37 +1,24 @@
+# Este Dockerfile es para una aplicación FastAPI que se ejecutará en un contenedor Docker. 
+# Utiliza la imagen base de Python 3.13-slim para mantener el tamaño del contenedor lo más 
+# pequeño posible. El Dockerfile copia los archivos necesarios, instala las dependencias y 
+# expone el puerto 8000 para que la aplicación sea accesible desde fuera del contenedor.
+
 FROM python:3.13-slim
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    postgresql-client \
-    && rm -rf /var/lib/apt/lists/*
+# Instalar uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-# Copy project files
+# Copiar archivos de dependencias
+COPY pyproject.toml uv.lock ./
+
+# Instalar dependencias
+RUN uv sync --frozen --no-dev
+
+# Copiar aplicación
 COPY . .
-
-# Install main dependencies
-RUN pip install --no-cache-dir \
-    alembic==1.18.4 \
-    bcrypt==3.2.2 \
-    certifi==2026.2.25 \
-    email-validator==2.3.0 \
-    fastapi==0.135.1 \
-    greenlet==3.3.2 \
-    minio==7.2.20 \
-    passlib==1.7.4 \
-    psycopg2-binary==2.9.11 \
-    pydantic==2.12.5 \
-    pydantic-settings==2.13.1 \
-    python-dotenv==1.2.2 \
-    python-jose==3.5.0 \
-    python-multipart>=0.0.27 \
-    requests>=2.33.1 \
-    sqlalchemy==2.0.48 \
-    uvicorn==0.41.0
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

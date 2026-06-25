@@ -1,10 +1,10 @@
-from sqlalchemy import String, Numeric, Boolean, Text, JSON, ForeignKey, Integer
+from sqlalchemy import String, Numeric, Boolean, Text, JSON, ForeignKey, Integer, DateTime
 from decimal import Decimal
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from app.database.Connection import Base
-
+from datetime import datetime
 class Product(Base):
     __tablename__ = "products"
     id: Mapped[uuid.UUID] = mapped_column(
@@ -57,6 +57,11 @@ class Product(Base):
     technical_spec: Mapped[dict] = mapped_column(
         JSON,
         nullable=True
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow    
     )
 
 

@@ -1,5 +1,9 @@
+// Authentication context for managing user state across the application
+// Provides user information and authentication methods
+
 import { createContext, useContext } from "react";
 
+// User interface defines the structure of authenticated user
 export interface User {
   id: string;
   name: string;
@@ -7,6 +11,7 @@ export interface User {
   role: "user" | "empresa" | "admin";
 }
 
+// AuthContextType defines all authentication related state and methods
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -16,9 +21,11 @@ interface AuthContextType {
   isCompany: () => boolean;
 }
 
+// Create the authentication context
 export const AuthContext = createContext<AuthContextType | null>(null);
 
-// Hook limpio
+// Custom hook to use authentication context
+// Must be called within components wrapped by AuthProvider
 export const useAuth = () => {
   const context = useContext(AuthContext);
 

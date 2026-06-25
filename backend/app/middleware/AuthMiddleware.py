@@ -17,8 +17,11 @@ PUBLIC_ROUTES = [
     "/auth/reset-password-user",
     "/auth/refresh",
     "/auth/logout",
+    "/media/proxy",
     "/docs",
-    "/openapi.json"
+    "/openapi.json",
+    "/media/proxy",
+    "/company/dashboard/update-my-product"
 ]
 
 ROLES_PERMISSIONS_ROUTERS = {
@@ -31,7 +34,11 @@ ROLES_PERMISSIONS_ROUTERS = {
     "company": [
         "/company/dashboard/me",
         "/company/dashboard/my-profile",
-        "/company/dashboard/upgrade-my-profile"
+        "/company/dashboard/upgrade-my-profile",
+        "/company/dashboard/patch-media-logo-banner",
+        "/company/dashboard/product",
+        "/company/dashboard/get-my-products",
+        "/company/dashboard/update-my-product/"
     ],
 
     "user": [
@@ -42,6 +49,8 @@ ROLES_PERMISSIONS_ROUTERS = {
 }
 
 async def auth_middleware(request: Request, call_next):
+
+    print("PATH:", request.url.path)
 
     if request.method == "OPTIONS":
         return await call_next(request)

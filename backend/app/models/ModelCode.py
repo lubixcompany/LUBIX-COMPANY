@@ -44,7 +44,7 @@ class Codes(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("users.id"),
-        unique=True,
+        unique=False,
         nullable=False
     )
 

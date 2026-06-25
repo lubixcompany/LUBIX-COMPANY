@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import NavbarUsuario from "../components/navbaruser";
 import Footer from "../components/footer";
 import {DevicePhoneMobileIcon,ComputerDesktopIcon,SpeakerWaveIcon,CameraIcon,ClockIcon}from "@heroicons/react/24/outline" 

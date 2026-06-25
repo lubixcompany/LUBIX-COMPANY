@@ -42,7 +42,20 @@ const RecoverPassword: React.FC = () => {
 
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        showMessage(err.response?.data?.detail || "Error enviando el correo", "error");
+        // Handle different error response formats
+        let errorMessage = "Error enviando el correo";
+        
+        const detail = err.response?.data?.detail;
+        
+        if (typeof detail === "string") {
+          errorMessage = detail;
+        } else if (Array.isArray(detail)) {
+          errorMessage = detail[0]?.msg || "Error de validación";
+        } else if (detail && typeof detail === "object" && "msg" in detail) {
+          errorMessage = (detail as { msg: string }).msg;
+        }
+        
+        showMessage(errorMessage, "error");
       } else {
         showMessage("Error de conexión", "error");
       }
