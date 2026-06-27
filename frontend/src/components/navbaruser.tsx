@@ -19,7 +19,13 @@ export default function NavbarUsuario() {
 
   return (
     <div className="flex items-center justify-between px-6 py-4 bg-[#162238] w-full">
-      <div className="text-green-500 text-2xl font-bold">Lubix</div>
+      <Link to="/" className="flex items-center">
+        <img
+          src="/lubix-logo.png"
+          alt="Lubix Logo"
+          className="h-10 w-auto" // ajusta tamaño según tu diseño
+        />
+      </Link>
 
       <div className="flex w-[500px] bg-[#1c2a4a] rounded-full overflow-hidden">
         <input
@@ -90,7 +96,7 @@ export default function NavbarUsuario() {
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-40 bg-[#1c2a4a] rounded shadow-lg py-2 z-50">
                 <Link
-                  to="dashboard-usuario"
+                  to="dashboard-user"
                   className="block px-4 py-2 text-white hover:bg-green-500 transition"
                   onClick={() => setMenuOpen(false)}
                 >

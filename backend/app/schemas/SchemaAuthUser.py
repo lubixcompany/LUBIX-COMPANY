@@ -90,10 +90,13 @@ class ResetPassword(BaseModel):
         return v
 
 class TokenResponse(BaseModel):
-    access_token:str
+    access_token: str
     refresh_token: str
     token_type: str = "bearer"
     role: str
+    user_id: str
+    full_name: str
+    email: str
 
 class RefreshRequest(BaseModel):
     old_refresh_token: str

@@ -1,16 +1,18 @@
-version: "3.9"
+# docker-compose.dev.yml — Desarrollo local
+# Uso: docker compose -f docker-compose.dev.yml up --build
+#
+# Diferencias con producción:
+#  - Backend: --reload habilitado, código montado como volumen
+#  - Frontend: servidor Vite (hot-reload), VITE_API_URL apunta directo al backend
+#  - No requiere nginx ni build de frontend
 
-# ─────────────────────────────────────────────────────────
-# docker-compose.yml — Producción / Nube
-# Levantar: docker compose up --build -d
-# ─────────────────────────────────────────────────────────
+version: "3.9"
 
 services:
 
-  # ── MinIO (almacenamiento de archivos) ──
   minio:
     image: minio/minio:latest
-    container_name: lubix-minio
+    container_name: lubix-minio-dev
     restart: always
     env_file:
       - ./backend/.env
@@ -20,7 +22,7 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - minio_data:/data
+      - minio_data_dev:/data
     command: server /data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -29,10 +31,9 @@ services:
       retries: 5
       start_period: 30s
 
-  # ── PostgreSQL ──
   postgres:
     image: postgres:16
-    container_name: lubix-postgres
+    container_name: lubix-postgres-dev
     restart: always
     env_file:
       - ./backend/.env
@@ -43,7 +44,7 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_dev:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -51,15 +52,17 @@ services:
       retries: 5
       start_period: 30s
 
-  # ── Backend FastAPI ──
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: lubix-backend
+    container_name: lubix-backend-dev
     restart: always
     ports:
       - "8001:8000"
+    # Montar código para hot-reload con --reload
+    volumes:
+      - ./backend:/app
     depends_on:
       postgres:
         condition: service_healthy
@@ -67,28 +70,26 @@ services:
         condition: service_healthy
     env_file:
       - ./backend/.env
-    environment:
-      URL_DATABASE: "postgresql://zerit:1234@postgres:5432/lubix"
-      MINIO_URL: "minio:9000"
-    # Producción: sin --reload
-    command: uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
+    command: uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-  # ── Frontend React (nginx, build de producción) ──
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        # nginx proxea /api → backend:8000 — no expone localhost
-        VITE_API_URL: /api
-    container_name: lubix-frontend
+      dockerfile: Dockerfile.dev
+    container_name: lubix-frontend-dev
     restart: always
     ports:
-      - "80:80"
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      # Apunta directo al backend (puerto expuesto en el host)
+      - VITE_API_URL=http://localhost:8001
     depends_on:
       - backend
+    command: pnpm run dev -- --host 0.0.0.0 --port 5173
 
 volumes:
-  postgres_data:
-  minio_data:
-
+  postgres_data_dev:
+  minio_data_dev:

@@ -33,8 +33,8 @@ def create_product_service(
         if nameCatalog:
             search_catalog = database.query(Catalog).filter(Catalog.name == nameCatalog).first()
             
-            if not nameCatalog:
-                raise HTTPException(status_code=401, detail="Este catalogo no existe")
+            if not search_catalog:
+                raise HTTPException(status_code=404, detail="Este catalogo no existe")
         
         print("Esto es solo una prueba")
         print("Name user", search_user.fullName)
@@ -148,6 +148,46 @@ def update_product_service(
         print(type(search_product.images))
         print(search_product.images)
 
+        # Actualizar campos opcionales
+        if nameProduct is not None:
+            search_product.name = nameProduct
+        if priceProduct is not None:
+            search_product.price = priceProduct
+        if discountEnable is not None:
+            search_product.discount_enable = discountEnable
+        if discountValue is not None:
+            search_product.discount_value = discountValue
+        if stockProduct is not None:
+            search_product.stock = stockProduct
+        if descripcionProduct is not None:
+            search_product.descripcion = descripcionProduct
+        if technicalSpecProduct is not None:
+            if isinstance(technicalSpecProduct, str):
+                search_product.technical_spec = json.loads(technicalSpecProduct)
+            else:
+                search_product.technical_spec = technicalSpecProduct
+        if search_catalog is not None:
+            search_product.catalog_id = search_catalog.id
+
+        # Gestionar imágenes
+        current_images = list(search_product.images or [])
+
+        if imagesToDeleted:
+            for img_path in imagesToDeleted:
+                try:
+                    nas.delete_file(img_path.replace("uploads/", ""))
+                except Exception:
+                    pass
+                if img_path in current_images:
+                    current_images.remove(img_path)
+
+        if imagesProduct:
+            for file in imagesProduct:
+                result = nas.upload_file(file, f"companies/{company.CompanyNIT}/imagesProduct/")
+                if result and result.get("path"):
+                    current_images.append(result["path"])
+
+        search_product.images = current_images
 
         print("ANTES COMMIT")
 
@@ -160,7 +200,7 @@ def update_product_service(
             "product_id": str(search_product.id)
         }
     
-    except HTTPException:
+    except HTTPException as e:
         database.rollback()
         print("ERROR:", type(e).__name__)
         print("ERROR:", str(e))

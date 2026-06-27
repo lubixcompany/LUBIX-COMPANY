@@ -36,10 +36,11 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      const payload: LoginRequest = { email: email.trim(), password };
-      
-      // Seleccionar el endpoint según el tipo de usuario
+      // Seleccionar el endpoint y payload según el tipo de usuario
       const endpoint = userType === "company" ? "/auth/login-company" : "/auth/login-user";
+      const payload = userType === "company"
+        ? { companyNIT: email.trim(), companyPassword: password }
+        : { email: email.trim(), password } as LoginRequest;
       const response = await api.post<LoginResponse>(endpoint, payload);
 
       const data = response.data;
@@ -49,18 +50,20 @@ const Login: React.FC = () => {
       localStorage.setItem("refresh_token", data.refresh_token);
 
       login(data.access_token, {
-        id: String(data.id),
-        name: data.Nombre,
+        id: data.user_id,
+        name: data.full_name,
         email: data.email,
-        role: (data.role || userType) as "user" | "empresa" | "admin",
+        role: data.role as "user" | "company" | "admin",
       });
 
       api.defaults.headers.common["Authorization"] = `Bearer ${data.access_token}`;
 
-      showMessage(`¡Bienvenido ${data.Nombre}!`, "success");
+      showMessage(`¡Bienvenido ${data.full_name}!`, "success");
 
-      // Redirigir según el tipo de usuario
-      if (userType === "company" || data.role === "empresa") {
+      // Redirigir según el rol devuelto por el backend
+      if (data.role === "admin") {
+        setTimeout(() => navigate("/dashboard-admin"), 1000);
+      } else if (data.role === "company") {
         setTimeout(() => navigate("/home-empresa"), 1000);
       } else {
         setTimeout(() => navigate("/home-usuario"), 1000);
@@ -141,13 +144,13 @@ const Login: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="card-form space-y-3 sm:space-y-4">
             <div className="mb-3 sm:mb-4">
-              <label className="label-base">Email</label>
+              <label className="label-base">{userType === "company" ? "NIT" : "Email"}</label>
               <input
-                type="email"
+                type={userType === "company" ? "text" : "email"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input-base"
-                placeholder="tu@email.com"
+                placeholder={userType === "company" ? "900123456" : "tu@email.com"}
                 disabled={loading}
               />
             </div>

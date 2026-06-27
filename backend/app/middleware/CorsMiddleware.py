@@ -9,10 +9,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.Config import config
 
 def setup_cors(app):
+    # Con allow_origins=["*"] y allow_credentials=True los navegadores rechazan la petición.
+    # Si URL_FRONTEND está definida se usa como origen específico con credentials habilitadas.
+    if config.URL_FRONTEND:
+        allow_origins = [config.URL_FRONTEND]
+        allow_credentials = True
+    else:
+        allow_origins = ["*"]
+        allow_credentials = False
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
+        allow_origins=allow_origins,
+        allow_credentials=allow_credentials,
         allow_methods=["*"],
         allow_headers=["*"]
     )

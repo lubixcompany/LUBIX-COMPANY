@@ -36,14 +36,13 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  message: string
-  access_token: string
+  access_token: string;
   refresh_token: string;
-  token_type: string
-  id: number
-  Nombre: string
-  email: string
-  role: string
+  token_type: string;
+  role: string;
+  user_id: string;
+  full_name: string;
+  email: string;
 }
 
 export interface ForgotPasswordRequest {

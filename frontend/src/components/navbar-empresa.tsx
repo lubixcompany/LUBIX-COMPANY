@@ -19,8 +19,12 @@ export default function NavbarEmpresa() {
 
   return (
     <div className="flex items-center justify-between px-6 py-4 bg-[#162238] w-full">
-      <Link to="/home-empresa" className="text-green-500 text-2xl font-bold hover:text-green-400 transition">
-        Lubix
+<Link to="/" className="flex items-center">
+        <img
+          src="/lubix-logo.png"
+          alt="Lubix Logo"
+          className="h-10 w-auto" // ajusta tamaño según tu diseño
+        />
       </Link>
 
       <div className="flex w-[500px] bg-[#1c2a4a] rounded-full overflow-hidden">

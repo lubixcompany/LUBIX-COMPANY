@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Helper methods to check user role
   const isUser = () => user?.role === "user";
-  const isCompany = () => user?.role === "empresa";
+  const isCompany = () => user?.role === "company";
 
   return (
     <AuthContext.Provider value={{ 

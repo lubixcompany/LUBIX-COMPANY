@@ -20,8 +20,6 @@ PUBLIC_ROUTES = [
     "/media/proxy",
     "/docs",
     "/openapi.json",
-    "/media/proxy",
-    "/company/dashboard/update-my-product"
 ]
 
 ROLES_PERMISSIONS_ROUTERS = {

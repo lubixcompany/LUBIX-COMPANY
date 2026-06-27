@@ -4,7 +4,10 @@ import os
 load_dotenv()
 
 class config():
-    URL_DATABASE = os.getenv("URL_DATABASE")
+    # Railway inyecta DATABASE_URL; localmente se usa URL_DATABASE
+    _db_url = os.getenv("URL_DATABASE") or os.getenv("DATABASE_URL", "")
+    # SQLAlchemy requiere 'postgresql://' no 'postgres://'
+    URL_DATABASE = _db_url.replace("postgres://", "postgresql://", 1) if _db_url else _db_url
     SECRET_KEY = os.getenv("SECRET_KEY")
     ALGORITHM = os.getenv("ALGORITHM")
     ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))

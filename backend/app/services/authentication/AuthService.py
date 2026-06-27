@@ -27,10 +27,10 @@ def register_user_service(user: createUser, database: Session):
     user_role = database.query(Role).filter(Role.name == "user").first()
     exists_user = database.query(Users).filter(Users.email == user.email).first()
     
-    try:
-        if exists_user:
-            raise HTTPException(status_code=409, detail="correo en uso")
+    if exists_user:
+        raise HTTPException(status_code=409, detail="correo en uso")
 
+    try:
         hashed_password = hash_password(user.password)
         new_user = Users(
             fullName = user.fullName,
@@ -51,6 +51,9 @@ def register_user_service(user: createUser, database: Session):
             "message": "Usuario registrado correctamente, se ha enviado un código de verificación a tu correo electrónico para verificar tu cuenta."
         }
     
+    except HTTPException:
+        raise
+
     except Exception as e:
         database.rollback()
 
@@ -98,9 +101,6 @@ def register_company_service(user: createUser, company: createCompany, certifica
         database.add(new_user)
         database.flush()
         
-        if certificate:
-            nas.upload_file(certificate, path)
-
         new_company = Company(
             user_id = new_user.id,
             nameCompany = company.companyName,
@@ -133,6 +133,15 @@ def register_company_service(user: createUser, company: createCompany, certifica
             "company_nit": new_company.CompanyNIT
         }
     
+    except HTTPException:
+        database.rollback()
+        if uploaded:
+            try:
+                nas.delete_file(path)
+            except Exception:
+                pass
+        raise
+
     except Exception as e:
         database.rollback()
 
@@ -200,7 +209,10 @@ def login_user_service(user: userLogin, database: Session):
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
-        role=search_user.role.name
+        role=search_user.role.name,
+        user_id=str(search_user.id),
+        full_name=search_user.fullName,
+        email=search_user.email
     )
 
 def login_company_service(company: LoginCompany, database: Session):
@@ -224,7 +236,10 @@ def login_company_service(company: LoginCompany, database: Session):
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
-        role=search_company.role.name
+        role=search_company.role.name,
+        user_id=str(search_company.id),
+        full_name=search_company.fullName,
+        email=search_company.email
     )
 
 def forgot_password_service(user: forgotPassword, database: Session):
@@ -283,8 +298,10 @@ def refresh_token_service(data: RefreshRequest, database: Session):
     return TokenResponse(
         access_token=new_access_token,
         refresh_token=new_refresh_token,
-        role=user.role.name
-
+        role=user.role.name,
+        user_id=str(user.id),
+        full_name=user.fullName,
+        email=user.email
     )
 
 def logout_service():

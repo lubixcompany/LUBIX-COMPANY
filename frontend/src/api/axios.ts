@@ -34,10 +34,13 @@ api.interceptors.response.use(
             old_refresh_token: refreshToken,
           });
 
-          const newAccessToken = res.data;
+          const newAccessToken = res.data.access_token;
 
           // Guardar nuevo access token
           localStorage.setItem("access_token", newAccessToken);
+          if (res.data.refresh_token) {
+            localStorage.setItem("refresh_token", res.data.refresh_token);
+          }
           api.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
 
          // Reintentar la petición original

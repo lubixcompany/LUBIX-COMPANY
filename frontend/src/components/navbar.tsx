@@ -11,8 +11,12 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-[#162238] w-full">
       {/* LOGO */}
-      <Link to="/" className="text-green-500 text-2xl font-bold">
-        Lubix
+      <Link to="/" className="flex items-center">
+        <img
+          src="/lubix-logo.png"
+          alt="Lubix Logo"
+          className="h-10 w-auto" // ajusta tamaño según tu diseño
+        />
       </Link>
 
       {/* SEARCH */}

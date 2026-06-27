@@ -8,7 +8,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: "user" | "empresa" | "admin";
+  role: "user" | "company" | "admin";
 }
 
 // AuthContextType defines all authentication related state and methods

@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 import uuid
 
 client = Minio(
-    "minio:9000",
+    config.MINIO_URL or "minio:9000",
     access_key=config.MINIO_ROOT_USER,
     secret_key=config.MINIO_ROOT_PASSWORD,
     secure=False
@@ -15,8 +15,8 @@ client = Minio(
 
 bucket = "uploads"
 
-if not client.bucket_exists(bucket):
-    client.make_bucket(bucket)
+# La inicialización del bucket se hace en el lifespan de main.py
+# para evitar crasheos si MinIO no está listo al iniciar el contenedor.
 
 
 class NasService:

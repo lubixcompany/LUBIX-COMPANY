@@ -14,6 +14,8 @@ import HomeEmpresa from "./pages/home-empresa";
 import RegistroEmpresa from "./pages/RegistroEmpresa";
 import DashboardUsuario from "./pages/dashboard-user";
 import DashboardEmpresa from "./pages/dashboard-empresa";
+import DashboardAdmin from "./pages/dashboard-admin";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -25,15 +27,18 @@ function App() {
       <Route path="/recover" element={<RecoverPassword />} />
       <Route path="/register/VerifyEmailPage" element={<VerificationCode />} />
       <Route path="/new-password" element={<NewPassword />} />
+      <Route path="/registro-empresa" element={<RegistroEmpresa />} />
 
       {/* User routes */}
-      <Route path="/home-usuario" element={<HomeUsuario />} />
-      <Route path="/dashboard-usuario" element={<DashboardUsuario />} />
+      <Route path="/home-usuario" element={<ProtectedRoute roles={["user"]}><HomeUsuario /></ProtectedRoute>} />
+      <Route path="/dashboard-usuario" element={<ProtectedRoute roles={["user"]}><DashboardUsuario /></ProtectedRoute>} />
 
       {/* Company routes */}
-      <Route path="/home-empresa" element={<HomeEmpresa />} />
-      <Route path="/registro-empresa" element={<RegistroEmpresa />} />
-      <Route path="/dashboard-empresa" element={<DashboardEmpresa />} />
+      <Route path="/home-empresa" element={<ProtectedRoute roles={["company"]}><HomeEmpresa /></ProtectedRoute>} />
+      <Route path="/dashboard-empresa" element={<ProtectedRoute roles={["company"]}><DashboardEmpresa /></ProtectedRoute>} />
+
+      {/* Admin routes */}
+      <Route path="/dashboard-admin" element={<ProtectedRoute roles={["admin"]}><DashboardAdmin /></ProtectedRoute>} />
     </Routes>
   );
 }

@@ -54,15 +54,19 @@ def company_dashboard_my_profile_service(user_id: str, database: Session):
 
 def company_dashboard_upgrade_my_profile_service(user_id: str, CompanyRequest:UpdateInformationCompanyRequest,database: Session):
     user = database.query(Users).filter(Users.id == user_id).first()
-    search_emails = database.query(Users).filter(Users.email == CompanyRequest.emailCompany)
-    print("recibido: ", CompanyRequest.emailCompany )
-    if not search_emails:
-        raise HTTPException(status_code=400, detail="El correo esta en uso")
-    
+
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    
-    
+
+    if CompanyRequest.emailCompany is not None:
+        existing_email = database.query(Users).filter(
+            Users.email == CompanyRequest.emailCompany,
+            Users.id != user.id
+        ).first()
+        if existing_email:
+            raise HTTPException(status_code=400, detail="El correo esta en uso")
+
+    print("recibido: ", CompanyRequest.emailCompany )
     company = user.company  # relationship por si se me olvida xd
 
     try:
