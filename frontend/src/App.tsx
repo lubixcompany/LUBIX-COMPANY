@@ -14,6 +14,7 @@ import HomeEmpresa from "./pages/home-empresa";
 import RegistroEmpresa from "./pages/RegistroEmpresa";
 import DashboardUsuario from "./pages/dashboard-user";
 import DashboardEmpresa from "./pages/dashboard-empresa";
+import ProductDetail from "./pages/ProductDetail";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
       {/* User routes */}
       <Route path="/home-usuario" element={<HomeUsuario />} />
       <Route path="/dashboard-usuario" element={<DashboardUsuario />} />
+      <Route path="/product/:id" element={<ProductDetail />} />
 
       {/* Company routes */}
       <Route path="/home-empresa" element={<HomeEmpresa />} />

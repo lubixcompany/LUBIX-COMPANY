@@ -5,7 +5,8 @@ from pydantic import BaseModel, EmailStr, field_validator
 import re
 
 class createUser(BaseModel):
-    fullName: str
+    first_name: str
+    last_name: str
     email: EmailStr
     password: str
     tell: str
@@ -18,12 +19,20 @@ class createUser(BaseModel):
             raise ValueError('correo electrónico no válido')
         return v
     
-    @field_validator('fullName')
-    def validate_fullName(cls, v: str):
-        if len(v) < 3:
-            raise ValueError('el nombre completo debe tener al menos 3 caracteres')
+    @field_validator('first_name')
+    def validate_first_name(cls, v: str):
+        if len(v) < 2:
+            raise ValueError('el nombre debe tener al menos 2 caracteres')
         if len(v) > 60:
-            raise ValueError('el nombre completo no debe exceder los 60 caracteres')
+            raise ValueError('el nombre no debe exceder los 60 caracteres')
+        return v
+
+    @field_validator('last_name')
+    def validate_last_name(cls, v: str):
+        if len(v) < 2:
+            raise ValueError('el apellido debe tener al menos 2 caracteres')
+        if len(v) > 60:
+            raise ValueError('el apellido no debe exceder los 60 caracteres')
         return v
 
     @field_validator('password')

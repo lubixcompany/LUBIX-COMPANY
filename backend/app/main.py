@@ -1,20 +1,45 @@
-## main.py: Este codigo sirve para iniciar la
-#  aplicacion de FastAPI del backend lubix, configurar las rutas y
-#  middlewares necesarios,.
+# main.py: Este código sirve para iniciar la
+# aplicación de FastAPI del backend lubix, configurar las rutas y
+# middlewares necesarios.
+
+# =========================
+# LIBRERÍAS EXTERNAS
+# =========================
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+
+# =========================
+# BASE DE DATOS
+# =========================
 from app.database.Connection import SessionLocal
+import app.models
+
+# =========================
+# CONFIG
+# =========================
+from app.Config import config
+
+# =========================
+# ROUTERS
+# =========================
 from app.routers import AuthRouters
 from app.routers import HealthRouter
 from app.routers import CompanyRouter
 from app.routers import mediaRouter
-import app.models
+from app.routers.HomeRouter import router as HomeRouter
+from app.routers import ProductRouter
+from app.routers import CardRouters  # lo tienes en tu estructura
+
+# =========================
+# MIDDLEWARE
+# =========================
 from app.middleware.AuthMiddleware import auth_middleware
 from app.middleware.CorsMiddleware import setup_cors
-from app.database.Connection import SessionLocal
-from app.utils.seed import run_seed
-from app.Config import config
 
+# =========================
+# UTILS
+# =========================
+from app.utils.seed import run_seed
 
 
 # =========================
@@ -29,6 +54,7 @@ async def lifespan(app):
 
     db.close()
     yield
+
 
 # =========================
 # APP
@@ -48,6 +74,6 @@ app.include_router(AuthRouters.router)
 app.include_router(HealthRouter.router)
 app.include_router(CompanyRouter.router)
 app.include_router(mediaRouter.router)
-
-
-
+app.include_router(HomeRouter.router)
+app.include_router(ProductRouter.router)
+app.include_router(CardRouters.router)

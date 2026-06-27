@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Request,Depends, UploadFile, File, Form
+from fastapi import APIRouter, Request, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
-from app.database.Connection import get_db
 from uuid import UUID
+from app.database.Connection import get_db
 
 from app.services.DashboardService.company.Products import (
     create_product_service,
@@ -18,7 +18,6 @@ from app.services.DashboardService.company.Dasboard import (
 )
 
 from app.schemas.SchemaDashboard.ShemaCompany import UpdateInformationCompanyRequest
-
 from app.services.NasService import NasService, get_nas_service
 
 router = APIRouter(
@@ -27,24 +26,21 @@ router = APIRouter(
 )
 
 @router.get("/dashboard/me")
-def dashboard(request: Request,database: Session = Depends(get_db)):
-
+def dashboard(request: Request, database: Session = Depends(get_db)):
     user_id = request.state.user_id
-    
-    return company_dashboard_me_service(
-        user_id= user_id,
-        database=database
-    )
+    return company_dashboard_me_service(user_id=user_id, database=database)
 
 @router.get("/dashboard/my-profile")
-def get_info_company(request:Request, database: Session =Depends(get_db)):
-    #Request del middleware
+def get_info_company(request: Request, database: Session = Depends(get_db)):
     user_id = request.state.user_id
     return company_dashboard_my_profile_service(user_id, database)
 
-# patch solo permite actualizar una o varias informacion, es opcional por el usuario.
 @router.patch("/dashboard/upgrade-my-profile")
-def upgrade_info_company_profile(request: Request, upgrade_profile: UpdateInformationCompanyRequest,database: Session = Depends(get_db)):
+def upgrade_info_company_profile(
+    request: Request,
+    upgrade_profile: UpdateInformationCompanyRequest,
+    database: Session = Depends(get_db)
+):
     user_id = request.state.user_id
     return company_dashboard_upgrade_my_profile_service(user_id, upgrade_profile, database)
 
@@ -56,9 +52,7 @@ def patch_media(
     nas: NasService = Depends(get_nas_service),
     database: Session = Depends(get_db)
 ):
-
     user_id = request.state.user_id
-
     return company_dasboard_upgrade_my_photo_and_banner_profile(
         user_id=user_id,
         nas=nas,
@@ -70,7 +64,7 @@ def patch_media(
 @router.post("/dashboard/product")
 def create_product(
     request: Request,
-    nameProduct: str = Form (...), 
+    nameProduct: str = Form(...), 
     nameCatalog: str = Form(...),
     priceProduct: float = Form(...),
     stockProduct: int = Form(...),
@@ -78,10 +72,9 @@ def create_product(
     technicalSpecProduct: str = Form(...),
     imagesProduct: list[UploadFile] = File(None),
     nas: NasService = Depends(get_nas_service),
-    database:Session = Depends(get_db)
+    database: Session = Depends(get_db)
 ):
     user_id = request.state.user_id
-
     return create_product_service(
         user_id=user_id,
         nameProduct=nameProduct, 
@@ -95,21 +88,18 @@ def create_product(
         database=database
     )
 
-# Para atraer productos de la empresa
 @router.get("/dashboard/get-my-products")
-def get_my_product( 
+def get_my_product(
     request: Request, 
-    page: int =  1, 
-    limit: int =10, 
+    page: int = 1, 
+    limit: int = 10, 
     database: Session = Depends(get_db)
 ):
-    print("accediendo a endpoint")
     user_id = request.state.user_id
-
     return company_dashboard_get_my_products(
         user_id,
         page=page,
-        limit= limit,
+        limit=limit,
         database=database
     )
 
@@ -117,7 +107,7 @@ def get_my_product(
 def upgrade_my_product(
     request: Request,
     idProduct: UUID,
-    nameProduct: str = Form (None), 
+    nameProduct: str = Form(None), 
     nameCatalog: str = Form(None),
     priceProduct: float = Form(None),
     discountEnable: bool = Form(None),
@@ -128,14 +118,9 @@ def upgrade_my_product(
     imagesProduct: list[UploadFile] = File(None),
     imagesToDeleted: list[str] | None = Form(None),
     nas: NasService = Depends(get_nas_service),
-    database:Session = Depends(get_db)
-    
-    ):
-    
+    database: Session = Depends(get_db)
+):
     user_id = request.state.user_id
-
-    print("Accediento al update point")
-
     return update_product_service(
         user_id=user_id,
         idProduct=idProduct,
@@ -155,5 +140,4 @@ def upgrade_my_product(
 
 @router.delete("/dashboard/delete-my-product/{product_id}")
 def delete_my_product(request: Request, database: Session = Depends(get_db)):
-    
     return delete_product_service()

@@ -3,31 +3,41 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 from app.database.Connection import Base
 import uuid
-
 from datetime import datetime
+
 class Users(Base):
     __tablename__ = "users"
+
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True, 
         default=uuid.uuid4
     )
-    fullName: Mapped[str] = mapped_column(
+
+    first_name: Mapped[str] = mapped_column(
         String(50), 
         nullable=False
     )
-    email: Mapped[str] = mapped_column(
+
+    last_name: Mapped[str] = mapped_column(
         String(50), 
+        nullable=False
+    )
+
+    email: Mapped[str] = mapped_column(
+        String(100), 
         nullable=False,
         unique=True
     )
+
     hashed_password: Mapped[str] = mapped_column(
         String(255), 
         nullable=False
     )
     
     tell: Mapped[str] = mapped_column(
-        String(50), nullable=False
+        String(50), 
+        nullable=False
     )
     
     verified: Mapped[bool] = mapped_column(
@@ -73,4 +83,3 @@ class Users(Base):
         back_populates="user",
         cascade="all, delete-orphan"
     )
-
