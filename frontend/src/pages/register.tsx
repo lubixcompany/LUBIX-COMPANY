@@ -10,7 +10,8 @@ export const Register = () => {
     const [mode, setMode] = useState<RegistrationMode>("usuario");
 
     const [form, setForm] = useState({
-        fullName: "",
+        name: "",
+        surname: "",
         email: "",
         tell: "",
         password: "",
@@ -25,31 +26,31 @@ export const Register = () => {
     const [type, setType] = useState<"success" | "error" | "">("");
     const [loading, setLoading] = useState(false);
 
-    const password = form.password
+    const password = form.password;
 
-    const hasMinLength = password.length >= 8
-    const hasUpper = /[A-Z]/.test(password)
-    const hasLower = /[a-z]/.test(password)
-    const hasNumber = /[0-9]/.test(password)
+    const hasMinLength = password.length >= 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
 
-    const strength = [hasMinLength, hasUpper, hasLower, hasNumber].filter(Boolean).length
-    const isPasswordValid = strength === 4
+    const strength = [hasMinLength, hasUpper, hasLower, hasNumber].filter(Boolean).length;
+    const isPasswordValid = strength === 4;
 
     const getStrengthColor = () => {
-        if (strength <= 1) return "bg-red-500"
-        if (strength === 2) return "bg-orange-500"
-        if (strength === 3) return "bg-yellow-400"
-        return "bg-green-500"
-    }
+        if (strength <= 1) return "bg-red-500";
+        if (strength === 2) return "bg-orange-500";
+        if (strength === 3) return "bg-yellow-400";
+        return "bg-green-500";
+    };
 
     const showPopup = (msg: string, t: "success" | "error") => {
-        setMessage(msg)
-        setType(t)
+        setMessage(msg);
+        setType(t);
         setTimeout(() => {
-            setMessage("")
-            setType("")
-        }, 3000)
-    }
+            setMessage("");
+            setType("");
+        }, 3000);
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm({
@@ -71,9 +72,16 @@ export const Register = () => {
             return;
         }
 
+        // Validación (Empresa)
         if (mode === "empresa") {
-            if (!form.companyName.trim() || !form.nit.trim() || !form.address.trim() || !form.sector) {
+            if (!form.companyName.trim() || !form.nit.trim() || !form.address.trim()) {
                 showPopup("Completa los datos de la empresa", "error");
+                return;
+            }
+        } else {
+            // Validación (Apellido)
+            if (!form.surname.trim()) {
+                showPopup("Completa tu apellido", "error");
                 return;
             }
         }
@@ -81,9 +89,10 @@ export const Register = () => {
         setLoading(true);
 
         try {
+            // Payload dinámico basado en el modo de registro
             const payload = mode === "empresa"
                 ? {
-                    fullName: form.fullName,
+                    name: form.name,
                     email: form.email,
                     tell: form.tell,
                     password: form.password,
@@ -92,7 +101,13 @@ export const Register = () => {
                     address: form.address,
                     sector: form.sector,
                 }
-                : form;
+                : {
+                    name: form.name,
+                    surname: form.surname,
+                    email: form.email,
+                    tell: form.tell,
+                    password: form.password,
+                };
 
             await api.post("/auth/register-user", payload);
             showPopup(
@@ -101,7 +116,8 @@ export const Register = () => {
             );
 
             setForm({
-                fullName: "",
+                name: "",
+                surname: "",
                 email: "",
                 tell: "",
                 password: "",
@@ -135,7 +151,7 @@ export const Register = () => {
             {message && (
                 <div className={type === "success" ? "popup-success" : "popup-error"}>
                     <div className="flex items-center gap-2">
-                        {type === "success" ? "✅" : "❌"}
+                        {type === "success" ? "Registro Exitoso" : "Error en el Registro"}
                         <span className="font-medium text-sm">{message}</span>
                     </div>
                 </div>
@@ -177,18 +193,38 @@ export const Register = () => {
                         onSubmit={handleRegister}
                         className="card-form space-y-4 sm:space-y-5"
                     >
-                        <div>
-                            <label className="label-base">
-                                {mode === "empresa" ? "Nombre del contacto *" : "Nombre completo *"}
-                            </label>
-                            <input
-                                name="fullName"
-                                value={form.fullName}
-                                onChange={handleChange}
-                                className="input-base"
-                                placeholder="Juan Pérez"
-                                required
-                            />
+                        {/* CORRECCIÓN AQUÍ: Grid dinámico e inputs condicionales */}
+                        <div className={`grid gap-4 ${mode === "usuario" ? "grid-cols-2" : "grid-cols-1"}`}>
+                            <div>
+                                <label className="label-base">
+                                    {mode === "empresa" ? "Nombre contacto *" : "Nombre *"}
+                                </label>
+                                <input
+                                    name="name"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    className="input-base"
+                                    placeholder={mode === "empresa" ? "Nombre de contacto" : "Su Nombre"}
+                                    required
+                                />
+                            </div>
+                            
+                            {/* El campo apellido solo se renderiza si el modo es 'usuario' */}
+                            {mode === "usuario" && (
+                                <div>
+                                    <label className="label-base">
+                                        Apellido *
+                                    </label>
+                                    <input
+                                        name="surname"
+                                        value={form.surname}
+                                        onChange={handleChange}
+                                        className="input-base"
+                                        placeholder="Su Apellido"
+                                        required
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -203,7 +239,7 @@ export const Register = () => {
                                 className="input-base"
                                 placeholder="tu@email.com"
                                 required
-                            />
+                              />
                         </div>
 
                         <div>
@@ -310,25 +346,6 @@ export const Register = () => {
                                         required
                                     />
                                 </div>
-
-                                <div>
-                                    <label className="label-base">
-                                        Sector empresarial *
-                                    </label>
-                                    <select
-                                        name="sector"
-                                        value={form.sector}
-                                        onChange={handleChange}
-                                        className="input-base"
-                                        required
-                                    >
-                                        <option value="">Selecciona una opción</option>
-                                        <option value="retail">Retail</option>
-                                        <option value="tecnologia">Tecnología</option>
-                                        <option value="servicios">Servicios</option>
-                                        <option value="manufactura">Manufactura</option>
-                                    </select>
-                                </div>
                             </>
                         )}
 
@@ -350,7 +367,7 @@ export const Register = () => {
                 </div>
             </div>
         </>
-    )
-}
+    );
+};
 
-export default Register
+export default Register;

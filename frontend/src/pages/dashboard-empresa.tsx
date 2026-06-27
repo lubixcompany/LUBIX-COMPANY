@@ -1,187 +1,664 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";;
-import NavbarEmpresa from "../components/navbar-empresa";;
-import Footer from "../components/footer";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import Navbar from '../components/navbar-empresa';
+import {
+  StarIcon,
+  ArrowTrendingUpIcon,
+  CubeIcon,           
+  EyeIcon,
+  CurrencyDollarIcon,
+  PlusIcon,
+  TrashIcon,          
+  XMarkIcon,          
+  ArrowUpTrayIcon,    
+  ChevronRightIcon,
+  PencilSquareIcon,   
+  CameraIcon,
+  EnvelopeIcon,       
+  PhoneIcon,
+  CalendarIcon,
+  ShieldCheckIcon,    
+  ChartBarIcon        
+} from "@heroicons/react/24/outline";
 
-const ofertas = [
+type Tab = 'products' | 'profile' | 'stats';
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  sold: number;
+  views: number;
+  rating: number;
+  stock: number;
+  active: boolean;
+  category: string;
+}
+
+interface ProductForm {
+  name: string;
+  price: string;
+  stock: string;
+  category: string;
+  description: string;
+  brand: string;
+  model: string;
+  warranty: string;
+  weight: string;
+  dimensions: string;
+  imageUrl: string;
+}
+
+const INITIAL_PRODUCTS: Product[] = [
   {
-    label: "Oferta 1",
-    titulo: "Laptops con hasta 40% off",
-    descripcion: "Los mejores portátiles al mejor precio",
-    imagen: "/portatil.png",
+    id: 1,
+    name: 'MacBook Pro 14" M3 Pro',
+    price: 11250000,
+    image: 'https://images.unsplash.com/photo-1770278881151-7cd11eb115b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBsYXB0b3AlMjBjb21wdXRlciUyMHRlY2hub2xvZ3l8ZW58MXx8fHwxNzczNzY3NzkyfDA&ixlib=rb-4.1.0&q=80&w=1080',
+    sold: 89,
+    views: 3420,
+    rating: 4.9,
+    stock: 12,
+    active: true,
+    category: 'Computadores',
   },
   {
-    label: "Oferta 2",
-    titulo: "Smartphones 30% descuento",
-    descripcion: "Última tecnología al alcance de todos",
-    imagen: "/iphone.png",
+    id: 2,
+    name: 'Auriculares Inalámbricos Premium',
+    price: 1350000,
+    image: 'https://images.unsplash.com/photo-1640300065113-738f2abb8ba6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3aXJlbGVzcyUyMGhlYWRwaG9uZXMlMjBhdWRpb3xlbnwxfHx8fDE3NzM2NzAwNjN8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    sold: 234,
+    views: 5680,
+    rating: 4.7,
+    stock: 45,
+    active: true,
+    category: 'Audio',
   },
   {
-    label: "Oferta 3",
-    titulo: "Accesorios 2x1",
-    descripcion: "El mejor complemento para tus dispositivos",
-    imagen: "/televisor.png",
+    id: 3,
+    name: 'iPhone 15 Pro Max - 256GB',
+    price: 5400000,
+    image: 'https://images.unsplash.com/photo-1646719223599-9864b351e242?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzbWFydHBob25lJTIwbW9iaWxlJTIwZGV2aWNlfGVufDF8fHx8MTc3Mzc2NTM3N3ww&ixlib=rb-4.1.0&q=80&w=1080',
+    sold: 156,
+    views: 8920,
+    rating: 4.8,
+    stock: 8,
+    active: false,
+    category: 'Smartphones',
+  },
+  {
+    id: 4,
+    name: 'Cámara Canon EOS R5',
+    price: 17550000,
+    image: 'https://images.unsplash.com/photo-1729655669048-a667a0b01148?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYW1lcmElMjBwaG90b2dyYXBoeSUyMGVxdWlwbWVudHxlbnwxfHx8fDE3NzM2NTAyNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    sold: 43,
+    views: 2340,
+    rating: 5.0,
+    stock: 3,
+    active: true,
+    category: 'Fotografía',
   },
 ];
 
-const infoCards = [
-  {
-    icon: "💻",
-    titulo: "¿Qué es Lubix?",
-    texto:
-      "Plataforma digital que conecta usuarios con empresas para descubrir, comparar y adquirir productos de forma rápida y segura.",
-  },
-  {
-    icon: "🛒",
-    titulo: "¿Qué hacemos?",
-    texto:
-      "Facilitamos la compra en línea con recogida en tienda, ofreciendo una experiencia práctica para clientes y empresas.",
-  },
-  {
-    icon: "🎯",
-    titulo: "Nuestra misión",
-    texto:
-      "Impulsar el comercio digital local con tecnología moderna que mejore la visibilidad y ventas de los negocios.",
-  },
-  {
-    icon: "⭐",
-    titulo: "Beneficios para clientes",
-    texto:
-      "Encuentra las mejores ofertas locales, compara precios fácilmente y recoge tus compras en minutos.",
-  },
-  {
-    icon: "📊",
-    titulo: "Ventajas para empresas",
-    texto:
-      "Aumenta tus ventas online, llega a más clientes cercanos y gestiona pedidos con nuestro sistema integrado.",
-  },
-  {
-    icon: "🚀",
-    titulo: "Empieza hoy",
-    texto:
-      "Regístrate gratis, explora productos y únete a la revolución del comercio local digital con Lubix.",
-    cta: true,
-  },
-];
+const EMPTY_FORM: ProductForm = {
+  name: '',
+  price: '',
+  stock: '',
+  category: '',
+  description: '',
+  brand: '',
+  model: '',
+  warranty: '',
+  weight: '',
+  dimensions: '',
+  imageUrl: '',
+};
 
-export default function Bienvenida() {
-  const [index, setIndex] = useState(0);
+const REFERENCE_IMAGE = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop';
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % ofertas.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+const sellerInfo = {
+  name: 'TechStore Colombia',
+  email: 'techstore@gmail.com',
+  phone: '+57 301 987 6543',
+  memberSince: 'Marzo 2024',
+  rating: 4.8,
+  totalSales: 1247,
+  totalReviews: 856,
+  avatar: 'T',
+};
+
+export default function SellerDashboard() {
+  const [activeTab, setActiveTab] = useState<Tab>('products');
+  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+  const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
+  const [imagePreview, setImagePreview] = useState('');
+
+  const totalRevenue = products.reduce((acc, p) => acc + p.price * p.sold, 0);
+  const activeProducts = products.filter((p) => p.active);
+
+  const toggleActive = (id: number) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, active: !p.active } : p))
+    );
+  };
+
+  const deleteProduct = (id: number) => {
+    setProducts((prev) => prev.filter((p) => p.id !== id));
+    setShowDeleteConfirm(null);
+  };
+
+  const handleFormChange = (field: keyof ProductForm, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    if (field === 'imageUrl') setImagePreview(value);
+  };
+
+  const handleAddProduct = () => {
+    if (!form.name || !form.price || !form.stock) return;
+    const newProduct: Product = {
+      id: Date.now(),
+      name: form.name,
+      price: parseInt(form.price.replace(/\D/g, '')) || 0,
+      image: form.imageUrl || REFERENCE_IMAGE,
+      sold: 0,
+      views: 0,
+      rating: 0,
+      stock: parseInt(form.stock) || 0,
+      active: true,
+      category: form.category || 'General',
+    };
+    setProducts((prev) => [newProduct, ...prev]);
+    setForm(EMPTY_FORM);
+    setImagePreview('');
+    setShowAddModal(false);
+  };
+
+  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
+    { id: 'products', label: 'Mis Productos', icon: <CubeIcon className="w-4 h-4" /> },
+    { id: 'stats', label: 'Estadísticas', icon: <ChartBarIcon className="w-4 h-4" /> },
+    { id: 'profile', label: 'Mi Perfil', icon: <ShieldCheckIcon className="w-4 h-4" /> },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-950">
-      <NavbarEmpresa />
+      <Navbar />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-      {/* HERO */}
-      <section className="flex flex-col md:flex-row items-center justify-between gap-10 px-6 md:px-16 py-20 max-w-7xl mx-auto">
-        {/* Texto izquierdo */}
-        <div className="max-w-lg text-center md:text-left">
-          <p className="text-green-500 text-xs font-semibold uppercase tracking-widest mb-3">
-            🏷 Oferta Especial
-          </p>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight mb-4">
-            Mega Sale de{" "}
-            <span className="text-green-400">Tecnología</span>
-          </h1>
-          <p className="text-slate-400 text-base mb-8 leading-relaxed">
-            Hasta{" "}
-            <span className="text-green-400 font-semibold">50% de descuento</span>{" "}
-            en productos seleccionados. Descubre, compara y compra de forma
-            rápida y segura.
-          </p>
-          <Link
-            to="/ofertas"
-            className="inline-block bg-green-500 hover:bg-green-400 text-white font-bold px-8 py-3 rounded-full transition-all shadow-lg shadow-green-500/30 hover:shadow-green-500/50"
-          >
-            Ver ofertas
-          </Link>
-        </div>
-
-        {/* Carrusel */}
-        <div className="w-72 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex-shrink-0 hover:border-green-500/40 transition-all">
-          <img
-            src={ofertas[index].imagen}
-            alt={ofertas[index].titulo}
-            className="w-full h-44 object-cover"
-          />
-          <div className="p-5 text-center">
-            <p className="text-green-500 text-xs font-bold uppercase tracking-widest mb-1">
-              {ofertas[index].label}
-            </p>
-            <h2 className="text-white font-bold text-base mb-1">
-              {ofertas[index].titulo}
-            </h2>
-            <p className="text-slate-400 text-sm mb-4">
-              {ofertas[index].descripcion}
-            </p>
-            <Link
-              to="/ofertas"
-              className="inline-block bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-5 py-2 rounded-full transition-all"
-            >
-              Comprar ahora
-            </Link>
-          </div>
-          {/* Dots */}
-          <div className="flex justify-center gap-2 pb-4">
-            {ofertas.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setIndex(i)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  i === index ? "bg-green-500 w-4" : "bg-slate-700"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* INFO */}
-      <section className="bg-slate-900/50 border-t border-slate-800 px-6 md:px-16 py-16">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-green-500 text-xs font-bold uppercase tracking-widest text-center mb-2">
-            Conoce Lubix
-          </p>
-          <h2 className="text-white text-2xl font-bold text-center mb-10">
-            Todo lo que necesitas en un solo lugar
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {infoCards.map((card) => (
-              <div
-                key={card.titulo}
-                className="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-green-500/40 hover:shadow-lg hover:shadow-green-500/10 transition-all"
-              >
-                <div className="w-9 h-9 bg-green-500/10 rounded-lg flex items-center justify-center text-lg mb-3">
-                  {card.icon}
-                </div>
-                <h3 className="text-white font-semibold text-sm mb-2">
-                  {card.titulo}
-                </h3>
-                <p className="text-slate-500 text-sm leading-relaxed">
-                  {card.texto}
-                </p>
-                {card.cta && (
-                  <Link
-                    to="/register"
-                    className="inline-block mt-4 bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-5 py-2 rounded-full transition-all shadow-lg shadow-green-500/30"
-                  >
-                    Comenzar
-                  </Link>
-                )}
+        {/* Header vendedor */}
+        <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl p-8 mb-8 shadow-xl shadow-green-500/20">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div className="relative">
+              <div className="w-24 h-24 bg-slate-900 rounded-full flex items-center justify-center text-4xl font-bold text-green-500 shadow-lg border-4 border-white/20">
+                {sellerInfo.avatar}
               </div>
-            ))}
+              <button className="absolute bottom-0 right-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-400 transition-colors">
+                <CameraIcon className="w-4 h-4 text-white" />
+              </button>
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex items-center gap-2 justify-center md:justify-start mb-1">
+                <h1 className="text-3xl font-bold text-white">{sellerInfo.name}</h1>
+                <span className="bg-green-500/20 border border-green-500/40 text-green-300 text-xs px-2 py-0.5 rounded-full font-medium">Vendedor</span>
+              </div>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-green-100 mt-2">
+                <div className="flex items-center gap-1">
+                  <StarIcon className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-semibold">{sellerInfo.rating}</span>
+                  <span className="text-sm">({sellerInfo.totalReviews} reseñas)</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <CubeIcon className="w-4 h-4" />
+                  <span>{sellerInfo.totalSales} ventas</span>
+                </div>
+                <div className="text-sm">Miembro desde {sellerInfo.memberSince}</div>
+              </div>
+            </div>
+            <button className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg transition-colors border border-white/20">
+              <PencilSquareIcon className="w-4 h-4" />
+              Editar perfil
+            </button>
           </div>
         </div>
-      </section>
-      <Footer />
-      
+
+        {/* Tabs */}
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all ${
+                activeTab === tab.id
+                  ? 'bg-green-500 text-white shadow-lg shadow-green-500/30'
+                  : 'bg-slate-800 text-gray-400 hover:text-gray-200 hover:bg-slate-700'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* PRODUCTS TAB */}
+        {activeTab === 'products' && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Mis Productos <span className="text-gray-500 font-normal text-base">({products.length})</span></h2>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-green-500/30 hover:shadow-green-500/50"
+              >
+                <PlusIcon className="w-5 h-5" />
+                Agregar producto
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  className={`bg-slate-900 rounded-xl border transition-all overflow-hidden ${
+                    product.active
+                      ? 'border-slate-800 hover:border-green-500/40 hover:shadow-lg hover:shadow-green-500/10'
+                      : 'border-slate-700 opacity-60'
+                  }`}
+                >
+                  <div className="relative aspect-square bg-slate-800">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className={`absolute top-2 left-2 text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                      product.active
+                        ? 'bg-green-500/20 border-green-500/40 text-green-300'
+                        : 'bg-red-500/20 border-red-500/40 text-red-300'
+                    }`}>
+                      {product.active ? 'Activo' : 'Inactivo'}
+                    </div>
+                    <div className="absolute top-2 right-2 bg-slate-900/90 backdrop-blur-sm px-2 py-0.5 rounded-lg text-xs font-semibold text-green-400 border border-slate-700">
+                      Stock: {product.stock}
+                    </div>
+                  </div>
+
+                  <div className="p-4">
+                    <Link to={`/seller/product/${product.id}`} className="block mb-2">
+                      <h3 className="text-gray-200 font-semibold line-clamp-2 h-11 hover:text-green-400 transition-colors text-sm">
+                        {product.name}
+                      </h3>
+                    </Link>
+                    <div className="text-green-400 font-bold mb-3">
+                      ${product.price.toLocaleString('es-CO')}
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
+                      <div className="flex items-center gap-1">
+                        <ArrowTrendingUpIcon className="w-3.5 h-3.5" />
+                        <span>{product.sold} vendidos</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <EyeIcon className="w-3.5 h-3.5" />
+                        <span>{product.views}</span>
+                      </div>
+                      {product.rating > 0 && (
+                        <div className="flex items-center gap-1">
+                          <StarIcon className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                          <span className="text-gray-300">{product.rating}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Acciones */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => toggleActive(product.id)}
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+                          product.active
+                            ? 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20'
+                            : 'bg-green-500/10 border border-green-500/30 text-green-400 hover:bg-green-500/20'
+                        }`}
+                        title={product.active ? 'Desactivar' : 'Activar'}
+                      >
+                        {/* Aquí simulamos el toggle visual usando clases condicionales de Tailwind */}
+                        <span className={`w-6 h-3.5 flex items-center bg-slate-700 rounded-full p-0.5 duration-300 ease-in-out ${product.active ? 'bg-yellow-500/40' : 'bg-green-500/40'}`}>
+                          <span className={`bg-white w-2.5 h-2.5 rounded-full shadow-md transform duration-300 ease-in-out ${product.active ? 'translate-x-0' : 'translate-x-2.5'}`}></span>
+                        </span>
+                        {product.active ? 'Desactivar' : 'Activar'}
+                      </button>
+                      <button
+                        onClick={() => setShowDeleteConfirm(product.id)}
+                        className="w-9 h-9 flex items-center justify-center bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 rounded-lg transition-all"
+                        title="Eliminar producto"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* STATS TAB */}
+        {activeTab === 'stats' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'Productos activos', value: activeProducts.length, icon: <CubeIcon className="w-5 h-5 text-green-400" /> },
+                { label: 'Ventas totales', value: products.reduce((a, p) => a + p.sold, 0), icon: <ArrowTrendingUpIcon className="w-5 h-5 text-blue-400" /> },
+                { label: 'Ingresos totales', value: `$${(totalRevenue / 1000000).toFixed(1)}M`, icon: <CurrencyDollarIcon className="w-5 h-5 text-yellow-400" /> },
+                { label: 'Calificación', value: sellerInfo.rating, icon: <StarIcon className="w-5 h-5 text-yellow-400 fill-yellow-400" /> },
+              ].map((stat) => (
+                <div key={stat.label} className="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-gray-400 text-sm">{stat.label}</span>
+                    {stat.icon}
+                  </div>
+                  <p className="text-2xl font-bold text-white">{stat.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+              <h2 className="text-lg font-bold text-white mb-5">Rendimiento por producto</h2>
+              <div className="space-y-4">
+                {products.map((p) => {
+                  const maxSold = Math.max(...products.map((x) => x.sold), 1);
+                  return (
+                    <div key={p.id} className="flex items-center gap-4">
+                      <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-white text-sm font-medium line-clamp-1">{p.name}</span>
+                          <span className="text-gray-400 text-xs ml-2 flex-shrink-0">{p.sold} vendidos</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all"
+                            style={{ width: `${(p.sold / maxSold) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PROFILE TAB */}
+        {activeTab === 'profile' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+              <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+                <ShieldCheckIcon className="w-5 h-5 text-green-400" /> Información del vendedor
+              </h2>
+              <div className="space-y-4">
+                {[
+                  { label: 'Nombre de tienda', value: sellerInfo.name, icon: <CubeIcon className="w-4 h-4 text-gray-400" /> },
+                  { label: 'Correo electrónico', value: sellerInfo.email, icon: <EnvelopeIcon className="w-4 h-4 text-gray-400" /> },
+                  { label: 'Teléfono', value: sellerInfo.phone, icon: <PhoneIcon className="w-4 h-4 text-gray-400" /> },
+                  { label: 'Miembro desde', value: sellerInfo.memberSince, icon: <CalendarIcon className="w-4 h-4 text-gray-400" /> },
+                ].map((field) => (
+                  <div key={field.label} className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
+                    {field.icon}
+                    <div className="flex-1">
+                      <p className="text-gray-500 text-xs">{field.label}</p>
+                      <p className="text-white text-sm font-medium">{field.value}</p>
+                    </div>
+                    <button className="text-gray-500 hover:text-green-400 transition-colors">
+                      <PencilSquareIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button className="w-full mt-5 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors">
+                Guardar cambios
+              </button>
+            </div>
+
+            <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <StarIcon className="w-5 h-5 text-yellow-400" /> Reputación y métricas
+              </h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                  <span className="text-gray-300">Calificación promedio</span>
+                  <div className="flex items-center gap-1">
+                    <StarIcon className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <span className="text-white font-bold">{sellerInfo.rating}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                  <span className="text-gray-300">Total de reseñas</span>
+                  <span className="text-white font-bold">{sellerInfo.totalReviews}</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                  <span className="text-gray-300">Ventas completadas</span>
+                  <span className="text-white font-bold">{sellerInfo.totalSales}</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                  <span className="text-gray-300">Nivel de vendedor</span>
+                  <span className="bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 text-xs px-3 py-1 rounded-full font-semibold">Platinum</span>
+                </div>
+              </div>
+              <div className="mt-4 p-3 bg-slate-800 rounded-lg">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-gray-400 text-xs">Progreso nivel</span>
+                  <span className="text-gray-400 text-xs">78%</span>
+                </div>
+                <div className="w-full bg-slate-700 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 rounded-full" style={{ width: '78%' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Modal - Agregar producto */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            {/* Modal header */}
+            <div className="flex items-center justify-between p-6 border-b border-slate-800 sticky top-0 bg-slate-900 z-10">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <PlusIcon className="w-5 h-5 text-green-400" />
+                Agregar nuevo producto
+              </h2>
+              <button
+                onClick={() => { setShowAddModal(false); setForm(EMPTY_FORM); setImagePreview(''); }}
+                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Imagen de referencia */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    URL de imagen del producto
+                  </label>
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      placeholder="https://..."
+                      value={form.imageUrl}
+                      onChange={(e) => handleFormChange('imageUrl', e.target.value)}
+                      className="flex-1 bg-slate-800 border border-slate-700 text-white placeholder-gray-500 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    />
+                  </div>
+                  <div className="w-full aspect-square rounded-xl overflow-hidden bg-slate-800 border-2 border-dashed border-slate-700 flex items-center justify-center relative">
+                    {imagePreview ? (
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" onError={() => setImagePreview(REFERENCE_IMAGE)} />
+                    ) : (
+                      <div className="text-center">
+                        <img src={REFERENCE_IMAGE} alt="Referencia" className="w-full h-full object-cover opacity-30" />
+                        <div className="absolute inset-0 flex items-center justify-center flex-col gap-2">
+                          <ArrowUpTrayIcon className="w-8 h-8 text-gray-400" />
+                          <p className="text-gray-400 text-xs">Vista previa</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Nombre */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                      Nombre del producto <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ej: Smartphone Samsung Galaxy S24"
+                      value={form.name}
+                      onChange={(e) => handleFormChange('name', e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 text-white placeholder-gray-500 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    />
+                  </div>
+
+                  {/* Precio */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                      Precio (COP) <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ej: 3500000"
+                      value={form.price}
+                      onChange={(e) => handleFormChange('price', e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 text-white placeholder-gray-500 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    />
+                  </div>
+
+                  {/* Stock */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                      Stock disponible <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Ej: 20"
+                      value={form.stock}
+                      onChange={(e) => handleFormChange('stock', e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 text-white placeholder-gray-500 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    />
+                  </div>
+
+                  {/* Categoría */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1.5">Categoría</label>
+                    <select
+                      value={form.category}
+                      onChange={(e) => handleFormChange('category', e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    >
+                      <option value="">Selecciona una categoría</option>
+                      <option value="Computadores">Computadores</option>
+                      <option value="Smartphones">Smartphones</option>
+                      <option value="Audio">Audio</option>
+                      <option value="Fotografía">Fotografía</option>
+                      <option value="Gaming">Gaming</option>
+                      <option value="Tablets">Tablets</option>
+                      <option value="Accesorios">Accesorios</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Descripción */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">Descripción</label>
+                <textarea
+                  rows={3}
+                  placeholder="Describe las características principales del producto..."
+                  value={form.description}
+                  onChange={(e) => handleFormChange('description', e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-700 text-white placeholder-gray-500 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500 transition-colors resize-none"
+                />
+              </div>
+
+              {/* Especificaciones técnicas */}
+              <div>
+                <h3 className="text-base font-semibold text-white mb-3 flex items-center gap-2">
+                  <ChevronRightIcon className="w-4 h-4 text-green-400" />
+                  Especificaciones técnicas
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { field: 'brand' as keyof ProductForm, label: 'Marca', placeholder: 'Ej: Samsung' },
+                    { field: 'model' as keyof ProductForm, label: 'Modelo', placeholder: 'Ej: Galaxy S24 Ultra' },
+                    { field: 'warranty' as keyof ProductForm, label: 'Garantía', placeholder: 'Ej: 1 año' },
+                    { field: 'weight' as keyof ProductForm, label: 'Peso', placeholder: 'Ej: 250g' },
+                    { field: 'dimensions' as keyof ProductForm, label: 'Dimensiones', placeholder: 'Ej: 15 x 7 x 0.9 cm' },
+                  ].map(({ field, label, placeholder }) => (
+                    <div key={field} className={field === 'dimensions' ? 'col-span-2' : ''}>
+                      <label className="block text-xs font-medium text-gray-400 mb-1.5">{label}</label>
+                      <input
+                        type="text"
+                        placeholder={placeholder}
+                        value={form[field]}
+                        onChange={(e) => handleFormChange(field, e.target.value)}
+                        className="w-full bg-slate-800 border border-slate-700 text-white placeholder-gray-500 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Botones */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => { setShowAddModal(false); setForm(EMPTY_FORM); setImagePreview(''); }}
+                  className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-gray-300 rounded-xl font-medium transition-colors border border-slate-700"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleAddProduct}
+                  disabled={!form.name || !form.price || !form.stock}
+                  className="flex-1 py-3 bg-green-500 hover:bg-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all shadow-lg shadow-green-500/30"
+                >
+                  Publicar producto
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal - Confirmar eliminación */}
+      {showDeleteConfirm !== null && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-red-500/30 rounded-2xl p-8 w-full max-w-sm shadow-2xl text-center">
+            <div className="w-14 h-14 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <TrashIcon className="w-7 h-7 text-red-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">¿Eliminar producto?</h3>
+            <p className="text-gray-400 text-sm mb-6">Esta acción no se puede deshacer. El producto será removido permanentemente.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(null)}
+                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-gray-300 rounded-xl font-medium transition-colors border border-slate-700"
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={() => deleteProduct(showDeleteConfirm)}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-semibold transition-all"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

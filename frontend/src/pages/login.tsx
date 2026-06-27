@@ -48,11 +48,12 @@ const Login: React.FC = () => {
       localStorage.setItem("access_token", data.access_token);
       localStorage.setItem("refresh_token", data.refresh_token);
 
+      // Interfaz de Usuario
       login(data.access_token, {
-        id: data.id,
+        id: data.id, 
         name: data.Nombre,
         email: data.email,
-        role: data.role || userType,
+        role_id: (data.role || userType) as "user" | "empresa" | "admin",
       });
 
       api.defaults.headers.common["Authorization"] = `Bearer ${data.access_token}`;
@@ -65,7 +66,6 @@ const Login: React.FC = () => {
       } else {
         setTimeout(() => navigate("/home-usuario"), 1000);
       }
-
 
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -81,7 +81,7 @@ const Login: React.FC = () => {
       {message && (
         <div className={messageType === "success" ? "popup-success" : "popup-error"}>
           <div className="flex items-center gap-1.5">
-            {messageType === "success" ? "✅" : "❌"}
+            {messageType === "success" ? "Inicio de Sesion Correcto" : "Error de Inicio de Sesion"}
             <span className="font-medium text-xs sm:text-sm">{message}</span>
           </div>
         </div>
@@ -109,7 +109,7 @@ const Login: React.FC = () => {
                   : "bg-gray-700 text-gray-300 hover:bg-gray-600"
               }`}
             >
-              👤 Usuario
+               Usuario
             </button>
             <button
               type="button"
@@ -120,7 +120,7 @@ const Login: React.FC = () => {
                   : "bg-gray-700 text-gray-300 hover:bg-gray-600"
               }`}
             >
-              🏢 Empresa
+              Empresa
             </button>
           </div>
 
@@ -164,7 +164,7 @@ const Login: React.FC = () => {
               <p className="text-muted text-xs sm:text-sm">
                 ¿No tienes cuenta?{" "}
                 <Link
-                  to={userType === "company" ? "/registro-empresa" : "/register"}
+                  to="/register"
                   className="text-accent hover:underline font-semibold text-xs sm:text-sm transition-colors"
                 >
                   Regístrate

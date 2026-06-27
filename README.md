@@ -2,8 +2,7 @@
 
 **Solución integral de gestión de usuarios, empresas y productos**
 
-Repositorio principal del código fuente de la compañía Lubix desarrollado por **Yeinher Algarin**.
-
+Repositorio principal del código fuente de la compañía Lubix.
 ---
 
 ## 📋 Tabla de Contenidos

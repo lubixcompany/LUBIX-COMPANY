@@ -62,7 +62,7 @@ const HomeUsuario: React.FC = () => {
       <section className="flex flex-col md:flex-row justify-between items-center px-8 md:px-16 py-20 min-h-[calc(100vh-80px)]" style={{ backgroundColor: "var(--color-bg)" }}>
         <div className="max-w-lg text-center md:text-left mr-8">
           <div className="text-accent mb-2 text-sm font-semibold uppercase tracking-wide">
-            👋 Hola 
+             Hola 
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight" style={{ color: "var(--color-text)" }}>
             Bienvenido de nuevo a Lubix

@@ -1,10 +1,10 @@
 import { createContext, useContext } from "react";
 
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  role: "user" | "empresa" | "admin";
+  role_id: "user" | "empresa" | "admin";
 }
 
 interface AuthContextType {

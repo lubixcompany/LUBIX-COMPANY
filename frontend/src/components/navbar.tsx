@@ -1,10 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
 
   const isLogged = !!user;
 
@@ -16,11 +20,18 @@ export default function Navbar() {
       </Link>
 
       {/* SEARCH */}
-      <input
-        type="text"
-        placeholder="Buscar..."
-        className="px-4 py-2 rounded-full bg-[#1c2a4a] text-white placeholder-gray-400 focus:outline-none w-64"
-      />
+      <form onSubmit={(e) => { e.preventDefault(); if (searchValue.trim()) navigate(`/buscar?q=${encodeURIComponent(searchValue.trim())}`); }} className="relative">
+        <input
+          type="text"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          placeholder="Buscar..."
+          className="px-4 py-2 rounded-full bg-[#1c2a4a] text-white placeholder-gray-400 focus:outline-none w-64 pr-10"
+        />
+        <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-green-400 transition">
+          <MagnifyingGlassIcon className="w-4 h-4" />
+        </button>
+      </form>
 
       {/* LINKS */}
       <div className="flex items-center gap-4 text-white">

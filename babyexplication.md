@@ -1,4 +1,4 @@
-# 👶 BABY EXPLANATION - Cómo Crear Una Página en LUBIX
+# 👶 BABY EXPLICATION - Cómo Crear Una Página en LUBIX
 
 **Para entenderlo como un niño de 8 años**
 

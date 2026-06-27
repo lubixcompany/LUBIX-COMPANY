@@ -5,19 +5,19 @@ import Footer from "../components/footer";
 
 const ofertas = [
   { 
-    titulo: "Oferta 1", 
+    titulo: "Asus Tuf Gaming F15", 
     descripcion: "Hasta 40% en laptops", 
     color: "bg-gradient-to-tr from-emerald-500 to-green-700 text-white",
     imagen: "/portatil.png"
   },
   { 
-    titulo: "Oferta 2", 
+    titulo: "iPhone 16 Pro", 
     descripcion: "Smartphones con 30% de descuento", 
     color: "bg-gradient-to-tr from-emerald-950 to-gray-900 text-white",
     imagen: "/iphone.png"
   },
   { 
-    titulo: "Oferta 3", 
+    titulo: "Samsung Galaxy Tv", 
     descripcion: "Accesorios 2x1", 
     color: "bg-gradient-to-tr from-emerald-500 to-green-700 text-white",
     imagen: "/televisor.png"
@@ -53,19 +53,28 @@ function Bienvenida() {
           <p className="text-lg text-muted mb-6">
             Y <span className="font-bold text-accent">50% de descuento</span> en productos seleccionados
           </p>
-      
         </div>
 
         {/* Carrusel */}
-        <div className="mt-10 md:mt-0 w-[420px] h-[500px] rounded-3xl shadow-2xl overflow-hidden flex flex-col items-center justify-between transform transition-all duration-700 ease-in-out hover:scale-105" style={{ backgroundColor: "var(--color-bg-card)" }}>
-          <img 
-            src={ofertas[index].imagen} 
-            alt={ofertas[index].titulo} 
-            className="w-full h-64 object-cover"
+        <div className="w-72 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex-shrink-0 hover:border-green-500/40 transition-all">
+          <img
+            src={ofertas[index].imagen}
+            alt={ofertas[index].titulo}
+            className="w-full h-44 object-cover"
           />
-          <div className={`w-full flex-1 flex flex-col items-center justify-center p-4 text-center ${ofertas[index].color}`}>
-            <h2 className="text-xl font-bold mb-1">{ofertas[index].titulo}</h2>
-            <p className="mb-3 text-sm">{ofertas[index].descripcion}</p>
+          <div className="p-5 text-center">
+            <p className="text-green-500 text-xs font-bold uppercase tracking-widest mb-1">
+              {ofertas[index].titulo}
+            </p>
+            <p className="text-slate-400 text-sm mb-4">
+              {ofertas[index].descripcion}
+            </p>
+            <Link
+              to="/ofertas"
+              className="inline-block bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-5 py-2 rounded-full transition-all"
+            >
+              Comprar ahora
+            </Link>
           </div>
         </div>
       </section>
