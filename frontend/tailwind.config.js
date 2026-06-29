@@ -1,6 +1,6 @@
 // tailwind.config.js
 module.exports = {
-  darkMode: "class", // Habilita dark mode por clase CSS
+  darkMode: "class", 
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
@@ -11,10 +11,9 @@ module.exports = {
         },
       },
       animation: {
-        fadeIn: "fadeIn 1s ease-out forwards",
+        fadeIn: "fadeIn 0.3s ease-out forwards", 
       },
     },
   },
   plugins: [],
 };
-

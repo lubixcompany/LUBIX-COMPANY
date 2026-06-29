@@ -43,7 +43,7 @@ ROLES_PERMISSIONS_ROUTERS = {
 
     "user": [
         "",
-        "/"
+        "/profile"
     ]
     
 }

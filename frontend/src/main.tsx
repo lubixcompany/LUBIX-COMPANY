@@ -1,5 +1,4 @@
-// Main entry point for the React application
-// Sets up context providers and renders the root component
+
 
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -8,6 +7,7 @@ import App from "./App";
 import "./index.css";
 import { AuthProvider } from "./context/AuthProvider";
 import { ThemeProvider } from "./context/ThemeProvider";
+import { CartProvider } from "./contexts/CartContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -17,7 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         {/* Authentication provider for user context */}
         <AuthProvider>
-          <App />
+          <CartProvider>
+            <App />
+          </CartProvider>
         </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>

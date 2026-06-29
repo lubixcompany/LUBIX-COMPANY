@@ -124,7 +124,7 @@ const Login: React.FC = () => {
                   : "bg-gray-700 text-gray-300 hover:bg-gray-600"
               }`}
             >
-              👤 Usuario
+              Usuario
             </button>
             <button
               type="button"
@@ -135,7 +135,7 @@ const Login: React.FC = () => {
                   : "bg-gray-700 text-gray-300 hover:bg-gray-600"
               }`}
             >
-              🏢 Empresa
+              Empresa
             </button>
           </div>
 
@@ -179,7 +179,7 @@ const Login: React.FC = () => {
               <p className="text-muted text-xs sm:text-sm">
                 ¿No tienes cuenta?{" "}
                 <Link
-                  to={userType === "company" ? "/registro-empresa" : "/register"}
+                  to={userType === "company" ? "/register/empresa" : "/register/usuario"}
                   className="text-accent hover:underline font-semibold text-xs sm:text-sm transition-colors"
                 >
                   Regístrate
