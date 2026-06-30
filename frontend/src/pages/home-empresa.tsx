@@ -1,168 +1,107 @@
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import NavbarEmpresa from "../components/navbar-empresa";
 import Footer from "../components/footer";
-import { 
-  ChartBarIcon, 
+import {
+  ArrowTrendingUpIcon,
+  ChartBarIcon,
+  CurrencyDollarIcon,
   ShoppingBagIcon,
-  CurrencyDollarIcon 
+  TruckIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 
-const GamepadIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className={props.className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M6 9h2m-1-1v2m7-1h2m-1-1v2m-6 6h6a5 5 0 005-5V9a5 5 0 00-5-5H9a5 5 0 00-5 5v2a5 5 0 005 5z"
-    />
-  </svg>
-);
+const quickActions = [
+  { title: "Panel de ventas", description: "Revisa pedidos y rendimiento diario", icon: ChartBarIcon, to: "/dashboard-empresa" },
+  { title: "Mis productos", description: "Gestiona catálogo, stock y promociones", icon: ShoppingBagIcon, to: "/dashboard-empresa" },
+  { title: "Reportes", description: "Analiza ingresos y conversiones", icon: CurrencyDollarIcon, to: "/dashboard-empresa" },
+];
 
-const promociones = [
-  { 
-    titulo: "Destaca tu Tienda", 
-    descripcion: "Promociones especiales para nuevos sellers", 
-    color: "bg-gradient-to-tr from-emerald-500 to-green-700 text-white",
-    imagen: "/portatil.png"
-  },
-  { 
-    titulo: "Aumenta tus Ventas", 
-    descripcion: "Herramientas de marketing incluidas", 
-    color: "bg-gradient-to-tr from-emerald-950 to-gray-900 text-white",
-    imagen: "/iphone.png"
-  },
-  { 
-    titulo: "Gestiona tu Inventario", 
-    descripcion: "Panel de control completo", 
-    color: "bg-gradient-to-tr from-emerald-500 to-green-700 text-white",
-    imagen: "/televisor.png"
-  },
+const highlights = [
+  { label: "Productos activos", value: "24", detail: "Catálogo actualizado" },
+  { label: "Órdenes este mes", value: "156", detail: "+18% vs. el mes pasado" },
+  { label: "Ingresos", value: "$45.2M", detail: "Meta superada" },
+  { label: "Tasa de conversión", value: "8.5%", detail: "En crecimiento" },
 ];
 
 const HomeEmpresa = () => {
-  const [index, setIndex] = useState(0);
-
-  // Rotación automática del carrusel
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % promociones.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <div className="page-container">
-      {/* NAVBAR */}
+    <div className="page-container bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <NavbarEmpresa />
 
-      {/* HERO */}
-      <section className="flex flex-col md:flex-row justify-between items-center px-8 md:px-16 py-20 min-h-[calc(100vh-80px)]" style={{ backgroundColor: "var(--color-bg)" }}>
-        <div className="max-w-lg text-center md:text-left mr-8">
-          <div className="text-accent mb-2 text-sm font-semibold uppercase tracking-wide">
-            🏢 Bienvenido a tu Tienda
-          </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight" style={{ color: "var(--color-text)" }}>
-            Gestiona tu Negocio en Lubix
-          </h1>
-          <p className="text-lg text-muted mb-6">
-            Administra tus <span className="font-bold text-accent">productos, pedidos y ganancias</span> desde un solo lugar.
-          </p>
-          <Link 
-            to="/empresa" 
-            className="inline-block bg-emerald-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-emerald-700 transition"
-          >
-            Ir al Dashboard
-          </Link>
-        </div>
-
-        {/* Carrusel de Promociones */}
-        <div className="mt-10 md:mt-0 w-[420px] h-[500px] rounded-3xl shadow-2xl overflow-hidden flex flex-col items-center justify-between transform transition-all duration-700 ease-in-out hover:scale-105" style={{ backgroundColor: "var(--color-bg-card)" }}>
-          <img 
-            src={promociones[index].imagen} 
-            alt={promociones[index].titulo} 
-            className="w-full h-64 object-cover"
-          />
-          <div className={`w-full flex-1 flex flex-col items-center justify-center p-4 text-center ${promociones[index].color}`}>
-            <h2 className="text-xl font-bold mb-1">{promociones[index].titulo}</h2>
-            <p className="mb-3 text-sm">{promociones[index].descripcion}</p>
-          </div>
-        </div>
-      </section>
-
-      {/* INFO - CARACTERÍSTICAS PRINCIPALES */}
-      <section className="grid md:grid-cols-3 gap-8 px-8 md:px-16 py-16 section-bg">
-        <div className="card">
-          <ChartBarIcon className="w-8 h-8 text-accent mb-3" />
-          <h2 className="text-accent mb-3 text-xl font-semibold">Estadísticas</h2>
-          <p className="text-muted text-sm leading-relaxed">
-            Monitorea el rendimiento de tu tienda con analytics en tiempo real.
-          </p>
-        </div>
-
-        <div className="card">
-          <ShoppingBagIcon className="w-8 h-8 text-accent mb-3" />
-          <h2 className="text-accent mb-3 text-xl font-semibold">Productos</h2>
-          <p className="text-muted text-sm leading-relaxed">
-            Gestiona tu catálogo, precios, inventario y ofertas fácilmente.
-          </p>
-        </div>
-
-        <div className="card">
-          <CurrencyDollarIcon className="w-8 h-8 text-accent mb-3" />
-          <h2 className="text-accent mb-3 text-xl font-semibold">Ingresos</h2>
-          <p className="text-muted text-sm leading-relaxed">
-            Visualiza tus ganancias y accede a reportes detallados de ventas.
-          </p>
-        </div>
-      </section>
-
-      {/* HERRAMIENTAS PRINCIPALES */}
-      <section className="card">
-        <h2 className="text-3xl font-bold mb-10 text-center">
-          Herramientas de Gestión
-        </h2>
-        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {[
-            { nombre: "Dashboard", icono: <ChartBarIcon className="w-10 h-10" /> },
-            { nombre: "Mis Productos", icono: <ShoppingBagIcon className="w-10 h-10" /> },
-         
-            { nombre: "Reportes", icono: <CurrencyDollarIcon className="w-10 h-10" /> },
-            { nombre: "Promociones", icono: <GamepadIcon className="w-10 h-10" /> },
-            { nombre: "Clientes", icono: <ChartBarIcon className="w-10 h-10" /> },
-            { nombre: "Configuración", icono: <ShoppingBagIcon className="w-10 h-10" /> },
-           
-          ].map((tool, i) => (
-            <div key={i} className="card hover:shadow-lg transition cursor-pointer">
-              <div className="text-4xl mb-3 text-accent">{tool.icono}</div>
-              <h3 className="font-semibold text-lg text-center">{tool.nombre}</h3>
+      <section className="px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-700 p-8 text-white shadow-2xl shadow-emerald-900/20">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm font-semibold backdrop-blur">
+              <SparklesIcon className="h-4 w-4" />
+              Tu tienda, más preparada que nunca
             </div>
-          ))}
+            <h1 className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+              Gestiona tu negocio con claridad y velocidad.
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm text-emerald-50 sm:text-base">
+              Centraliza productos, pedidos y métricas para que cada venta se traduzca en crecimiento real.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/dashboard-empresa" className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50">
+                Ir al dashboard
+              </Link>
+              <Link to="/dashboard-empresa" className="rounded-full border border-white/40 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10">
+                Ver productos
+              </Link>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/70 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-emerald-600">Resumen del día</p>
+                <h2 className="text-2xl font-bold">Todo listo para vender</h2>
+              </div>
+              <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-600 dark:bg-emerald-500/10">
+                <TruckIcon className="h-6 w-6" />
+              </div>
+            </div>
+            <div className="mt-6 space-y-3">
+              {highlights.map((item) => (
+                <div key={item.label} className="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 dark:border-slate-800">
+                  <div>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{item.label}</p>
+                    <p className="text-lg font-semibold text-slate-900 dark:text-white">{item.value}</p>
+                  </div>
+                  <span className="text-sm font-medium text-emerald-600">{item.detail}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ESTADÍSTICAS RÁPIDAS */}
-      <section className="card">
-        <h2 className="text-3xl font-bold mb-10 text-center text-emerald-700">Resumen Rápido</h2>
-        <div className="grid md:grid-cols-4 gap-6">
-          {[
-            { label: "Productos Activos", valor: "24", icon: "📦" },
-            { label: "Órdenes Este Mes", valor: "156", icon: "📋" },
-            { label: "Ingresos Totales", valor: "$45.2M", icon: "💰" },
-            { label: "Tasa de Conversión", valor: "8.5%", icon: "📈" },
-          ].map((stat, i) => (
-            <div key={i} className="bg-white rounded-xl shadow-lg p-6 text-center hover:-translate-y-2 transition">
-              <div className="text-4xl mb-2">{stat.icon}</div>
-              <p className="text-sm text-gray-600 mb-2">{stat.label}</p>
-              <h3 className="font-bold text-2xl text-emerald-600">{stat.valor}</h3>
+      <section className="px-4 pb-8 sm:px-6 lg:px-8 lg:pb-12">
+        <div className="mx-auto max-w-7xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-emerald-600">Acciones rápidas</p>
+              <h2 className="text-2xl font-bold">Todo lo que necesitas para crecer</h2>
             </div>
-          ))}
+            <div className="rounded-full bg-emerald-50 p-2 text-emerald-600 dark:bg-emerald-500/10">
+              <ArrowTrendingUpIcon className="h-5 w-5" />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {quickActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link key={action.title} to={action.to} className="rounded-2xl border border-slate-200 p-5 transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg dark:border-slate-800">
+                  <div className="mb-3 inline-flex rounded-2xl bg-emerald-50 p-3 text-emerald-600 dark:bg-emerald-500/10">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{action.title}</h3>
+                  <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{action.description}</p>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </section>
 

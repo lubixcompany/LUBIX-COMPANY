@@ -48,3 +48,7 @@ Thumbs.db
 # Archivos de configuración sensibles
 backend/.env
 frontend/.env
+
+.pnpm-store/
+frontend/.pnpm-store/
+node_modules/
