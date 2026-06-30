@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import NavbarUsuario from "../components/navbarUsuario";
 import { useCart } from "../contexts/CartContext";
@@ -34,54 +35,6 @@ const EMPTY_PROFILE: ProfileData = {
   avatarUrl: null,
 };
 
-const SAMPLE_ORDERS: Order[] = [
-  {
-    id: "PED-8422",
-    product: "Laptop Gaming GX-16",
-    image: "/macbook.png",
-    price: 4850000,
-    status: "en camino",
-    date: "21 Jun 2026",
-    seller: "Lubix Oficial",
-    tracking: "TRK-33475",
-  },
-  {
-    id: "PED-9931",
-    product: "Auriculares Wireless Pro",
-    image: "/headphones.png",
-    price: 1080000,
-    status: "procesando",
-    date: "18 Jun 2026",
-    seller: "Lubix Oficial",
-  },
-];
-
-const SAMPLE_SAVED: SavedProduct[] = [
-  {
-    id: 1,
-    name: "Smartphone Ultra 5G",
-    price: 3299000,
-    image: "/iphone.png",
-    rating: 4.9,
-  },
-  {
-    id: 2,
-    name: "Teclado mecánico RGB",
-    price: 399000,
-    image: "/televisor.png",
-    rating: 4.7,
-  },
-];
-
-const SAMPLE_ADDRESSES: Address[] = [
-  {
-    id: 1,
-    label: "Casa",
-    address: "Cra 13 #45-78",
-    city: "Bogotá",
-    isDefault: true,
-  },
-];
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; steps: string[] }> = {
   entregado: { label: "Entregado", color: "text-green-400", bg: "bg-green-500/10 border-green-500/30", steps: ["Confirmado", "Preparando", "En camino", "Entregado"] },
@@ -97,31 +50,67 @@ export default function DashboardUsuario() {
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState<ProfileData>(EMPTY_PROFILE);
-  const [orders] = useState<Order[]>(SAMPLE_ORDERS);
-  const [savedList] = useState<SavedProduct[]>(SAMPLE_SAVED);
-  const [addresses, setAddresses] = useState<Address[]>(SAMPLE_ADDRESSES);
+  const [orders] = useState<Order[]>([]);
+  const [savedList] = useState<SavedProduct[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [loadingProfile, setLoadingProfile] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [modal, setModal] = useState<Modal>(null);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState("");
   const [addrForm, setAddrForm] = useState({ label: "", address: "", city: "" });
   const [editingAddr, setEditingAddr] = useState<Address | null>(null);
-  const [deletingAddrId, setDeletingAddrId] = useState<number | null>(null);
+  const [deletingAddrId, setDeletingAddrId] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (user) {
-      setProfile((current) => ({
-        ...current,
-        name: user.name,
-        email: user.email,
-        memberSince: current.memberSince || "Jul 2024",
-      }));
+    async function loadData() {
+      // Cargar el perfil desde la API; si falla, usar datos del contexto de auth
+      try {
+        const profileRes = await api.get("/profile/me");
+        const p = profileRes.data;
+        setProfile({
+          name: p.fullName,
+          email: p.email,
+          phone: p.tell ?? "",
+          memberSince: p.member_since,
+          avatarColor: "from-blue-500 to-indigo-600",
+          avatarUrl: null,
+        });
+      } catch {
+        // Fallback: mostrar datos del JWT si el API no responde
+        if (user) {
+          setProfile((prev) => ({
+            ...prev,
+            name: user.name,
+            email: user.email,
+          }));
+        }
+      }
+
+      try {
+        const addressRes = await api.get("/profile/addresses");
+        setAddresses(
+          addressRes.data.map((a: { id: string; label: string; address: string; city: string; is_default: boolean }) => ({
+            id: a.id,
+            label: a.label,
+            address: a.address,
+            city: a.city,
+            isDefault: a.is_default,
+          }))
+        );
+      } catch {
+        // direcciones fallan silenciosamente
+      } finally {
+        setLoadingProfile(false);
+      }
     }
-  }, [user]);
+    loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const totalSpent = orders.reduce((sum, order) => sum + order.price, 0);
 
@@ -135,16 +124,21 @@ export default function DashboardUsuario() {
     setTempValue("");
   };
 
-  const saveField = (field: keyof ProfileData) => {
+  const saveField = async (field: keyof ProfileData) => {
     if (!tempValue.trim()) {
       toast.error("Ingresa un valor válido");
       return;
     }
-
-    setProfile((current) => ({ ...current, [field]: tempValue.trim() }));
-    setEditingField(null);
-    setTempValue("");
-    toast.success("Perfil actualizado");
+    const updated = { ...profile, [field]: tempValue.trim() };
+    try {
+      await api.put("/profile/me", { fullName: updated.name, tell: updated.phone || undefined });
+      setProfile(updated);
+      setEditingField(null);
+      setTempValue("");
+      toast.success("Perfil actualizado");
+    } catch {
+      toast.error("Error al guardar cambios");
+    }
   };
 
   const handleAvatarFile = (file: File) => {
@@ -175,9 +169,14 @@ export default function DashboardUsuario() {
     if (file) handleAvatarFile(file);
   };
 
-  const setDefaultAddress = (id: number) => {
-    setAddresses((list) => list.map((address) => ({ ...address, isDefault: address.id === id })));
-    toast.success("Dirección predeterminada actualizada");
+  const setDefaultAddress = async (id: string) => {
+    try {
+      await api.put(`/profile/addresses/${id}`, { is_default: true });
+      setAddresses((list) => list.map((address) => ({ ...address, isDefault: address.id === id })));
+      toast.success("Dirección predeterminada actualizada");
+    } catch {
+      toast.error("Error al actualizar la dirección");
+    }
   };
 
   const openEditAddress = (address: Address) => {
@@ -186,31 +185,46 @@ export default function DashboardUsuario() {
     setModal("editAddress");
   };
 
-  const saveAddress = () => {
+  const saveAddress = async () => {
     if (!addrForm.label || !addrForm.address || !addrForm.city) {
       toast.error("Completa todos los campos");
       return;
     }
-
-    if (editingAddr) {
-      setAddresses((list) => list.map((address) => address.id === editingAddr.id ? { ...address, ...addrForm } : address));
-      toast.success("Dirección actualizada");
-    } else {
-      setAddresses((list) => [...list, { id: Date.now(), ...addrForm, isDefault: list.length === 0 }]);
-      toast.success("Dirección agregada");
+    try {
+      if (editingAddr) {
+        await api.put(`/profile/addresses/${editingAddr.id}`, addrForm);
+        setAddresses((list) => list.map((address) => address.id === editingAddr.id ? { ...address, ...addrForm } : address));
+        toast.success("Dirección actualizada");
+      } else {
+        const res = await api.post("/profile/addresses", { ...addrForm, is_default: addresses.length === 0 });
+        setAddresses((list) => [...list, {
+          id: res.data.id,
+          label: res.data.label,
+          address: res.data.address,
+          city: res.data.city,
+          isDefault: res.data.is_default,
+        }]);
+        toast.success("Dirección agregada");
+      }
+      setModal(null);
+      setAddrForm({ label: "", address: "", city: "" });
+      setEditingAddr(null);
+    } catch {
+      toast.error("Error al guardar la dirección");
     }
-
-    setModal(null);
-    setAddrForm({ label: "", address: "", city: "" });
-    setEditingAddr(null);
   };
 
-  const deleteAddress = () => {
+  const deleteAddress = async () => {
     if (deletingAddrId === null) return;
-    setAddresses((list) => list.filter((address) => address.id !== deletingAddrId));
-    toast.success("Dirección eliminada");
-    setModal(null);
-    setDeletingAddrId(null);
+    try {
+      await api.delete(`/profile/addresses/${deletingAddrId}`);
+      setAddresses((list) => list.filter((address) => address.id !== deletingAddrId));
+      toast.success("Dirección eliminada");
+      setModal(null);
+      setDeletingAddrId(null);
+    } catch {
+      toast.error("Error al eliminar la dirección");
+    }
   };
 
   const addSavedToCart = (product: SavedProduct) => {
@@ -222,6 +236,20 @@ export default function DashboardUsuario() {
     ? profile.name.split(" ").map((part) => part[0]).slice(0, 2).join("").toUpperCase()
     : "?";
 
+
+  if (loadingProfile) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white">
+        <NavbarUsuario />
+        <div className="flex items-center justify-center py-32">
+          <div className="flex flex-col items-center gap-3 text-slate-400">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-green-400" />
+            <p className="text-sm">Cargando perfil...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">

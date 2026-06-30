@@ -3,18 +3,22 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 import { useCart } from "../contexts/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { allProducts } from "../data/products";
-import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { ArrowLeft, ShoppingCart, CheckCircle } from "lucide-react";
 
 export default function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, items } = useCart();
+  const { isAuthenticated } = useAuth();
 
   const product = useMemo(
     () => allProducts.find((item) => String(item.id) === String(id)),
     [id]
   );
+
+  const isInCart = product ? items.some((i) => i.id === product.id) : false;
 
   if (!product) {
     return (
@@ -73,12 +77,25 @@ export default function ProductPage() {
               {product.discount ? <span className="text-sm text-slate-400 line-through">${product.price.toLocaleString('es-CO')}</span> : null}
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, image: product.image, category: product.category, discount: product.discount })}
-                className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
-              >
-                <ShoppingCart className="h-4 w-4" /> Agregar al carrito
-              </button>
+              {!isAuthenticated ? (
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-2 rounded-full bg-emerald-500/60 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500"
+                >
+                  <ShoppingCart className="h-4 w-4" /> Inicia sesión para comprar
+                </Link>
+              ) : isInCart ? (
+                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-5 py-3 text-sm font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400">
+                  <CheckCircle className="h-4 w-4" /> Ya está en tu carrito
+                </div>
+              ) : (
+                <button
+                  onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, image: product.image, category: product.category, discount: product.discount })}
+                  className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
+                >
+                  <ShoppingCart className="h-4 w-4" /> Agregar al carrito
+                </button>
+              )}
               <Link
                 to="/carrito"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:border-emerald-500 hover:text-emerald-600 dark:border-slate-700 dark:text-slate-100"

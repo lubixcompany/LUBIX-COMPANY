@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { Toaster, toast } from 'sonner';
 import {
   ArrowLeft,
@@ -144,6 +145,7 @@ export default function SearchPage() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q')?.trim() ?? '';
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
 
   const [sort, setSort] = useState<SortOption>('relevance');
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
@@ -455,25 +457,35 @@ export default function SearchPage() {
                           </div>
 
                           {/* Botón agregar al carrito */}
-                          <button
-                            onClick={() => {
-                                              addToCart({
-                                id: product.id,
-                                name: product.name,
-                                price: product.price,
-                                image: product.image,
-                                category: product.category,
-                                discount: product.discount,
-                              });
-                              toast.success('Agregado al carrito', {
-                                description: product.name,
-                              });
-                            }}
-                            className="w-full flex items-center justify-center gap-1.5 py-2 bg-green-500 hover:bg-green-400 active:scale-95 text-white rounded-lg text-sm font-semibold transition-all"
-                          >
-                            <ShoppingCart className="w-3.5 h-3.5" />
-                            Agregar al carrito
-                          </button>
+                          {isAuthenticated ? (
+                            <button
+                              onClick={() => {
+                                addToCart({
+                                  id: product.id,
+                                  name: product.name,
+                                  price: product.price,
+                                  image: product.image,
+                                  category: product.category,
+                                  discount: product.discount,
+                                });
+                                toast.success('Agregado al carrito', {
+                                  description: product.name,
+                                });
+                              }}
+                              className="w-full flex items-center justify-center gap-1.5 py-2 bg-green-500 hover:bg-green-400 active:scale-95 text-white rounded-lg text-sm font-semibold transition-all"
+                            >
+                              <ShoppingCart className="w-3.5 h-3.5" />
+                              Agregar al carrito
+                            </button>
+                          ) : (
+                            <Link
+                              to="/login"
+                              className="w-full flex items-center justify-center gap-1.5 py-2 bg-green-500/60 hover:bg-green-500 text-white rounded-lg text-sm font-semibold transition-all"
+                            >
+                              <ShoppingCart className="w-3.5 h-3.5" />
+                              Inicia sesión para comprar
+                            </Link>
+                          )}
                         </div>
                       </div>
                     );

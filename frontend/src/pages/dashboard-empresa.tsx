@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";;
-import NavbarEmpresa from "../components/navbar-empresa";;
+import { Link } from "react-router-dom";
+import NavbarEmpresa from "../components/navbar-empresa";
 import Footer from "../components/footer";
 
 const ofertas = [

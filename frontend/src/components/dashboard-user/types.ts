@@ -27,7 +27,7 @@ export interface SavedProduct {
 }
 
 export interface Address {
-  id: number;
+  id: string;
   label: string;
   address: string;
   city: string;

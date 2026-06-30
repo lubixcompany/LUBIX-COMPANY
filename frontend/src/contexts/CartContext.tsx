@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export interface CartItem {
   id: number;
@@ -23,20 +24,27 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    if (typeof window === 'undefined') return [];
-    const stored = window.localStorage.getItem('lubix-cart');
-    if (!stored) return [];
-    try {
-      return JSON.parse(stored) as CartItem[];
-    } catch {
-      return [];
-    }
-  });
+  const { user } = useAuth();
+  const cartKey = `lubix-cart-${user?.id ?? 'guest'}`;
 
+  const [items, setItems] = useState<CartItem[]>([]);
+
+  // Carga el carrito del usuario cuando cambia (login / logout)
   useEffect(() => {
-    window.localStorage.setItem('lubix-cart', JSON.stringify(items));
-  }, [items]);
+    if (typeof window === 'undefined') return;
+    const stored = window.localStorage.getItem(cartKey);
+    try {
+      setItems(stored ? (JSON.parse(stored) as CartItem[]) : []);
+    } catch {
+      setItems([]);
+    }
+  }, [cartKey]);
+
+  // Persiste el carrito en la clave del usuario actual
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(cartKey, JSON.stringify(items));
+  }, [items, cartKey]);
 
   const addToCart = (item: Omit<CartItem, 'quantity'>) => {
     setItems((current) => {

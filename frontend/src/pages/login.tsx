@@ -66,7 +66,7 @@ const Login: React.FC = () => {
       } else if (data.role === "company") {
         setTimeout(() => navigate("/home-empresa"), 1000);
       } else {
-        setTimeout(() => navigate("/home-usuario"), 1000);
+        setTimeout(() => navigate("/search"), 1000);
       }
 
 
