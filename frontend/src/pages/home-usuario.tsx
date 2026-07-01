@@ -3,8 +3,19 @@ import { Link } from "react-router-dom";
 import NavbarUsuario from "../components/navbarUsuario";
 import Footer from "../components/footer";
 import { useCart } from "../contexts/CartContext";
-import { allProducts } from "../data/products";
+import api from "../api/axios";
 import { DevicePhoneMobileIcon, ComputerDesktopIcon, SpeakerWaveIcon, CameraIcon, ClockIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+
+interface ApiProduct {
+  id: string;
+  name: string;
+  price: number;
+  images: string[];
+  discount_enable: boolean;
+  discount_value: number;
+  stock: number;
+  descripcion: string;
+}
 
 const GamepadIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -47,7 +58,13 @@ const ofertas = [
 const HomeUsuario: React.FC = () => {
   const [index, setIndex] = useState(0);
   const { addToCart } = useCart();
-  const featuredProducts = allProducts.slice(0, 3);
+  const [featuredProducts, setFeaturedProducts] = useState<ApiProduct[]>([]);
+
+  useEffect(() => {
+    api.get("/catalog/products", { params: { limit: 3 } })
+      .then((res) => setFeaturedProducts(res.data.results ?? []))
+      .catch(() => setFeaturedProducts([]));
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -154,20 +171,22 @@ const HomeUsuario: React.FC = () => {
 
           <div className="grid gap-6 md:grid-cols-3">
             {featuredProducts.map((product) => {
-              const discountedPrice = product.discount ? product.price - (product.price * product.discount) / 100 : product.price;
+              const discountedPrice = product.discount_enable && product.discount_value
+                ? product.price - (product.price * product.discount_value) / 100
+                : product.price;
+              const image = product.images?.[0] ?? "";
               return (
                 <div key={product.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900">
-                  <img src={product.image} alt={product.name} className="mb-4 h-52 w-full rounded-3xl object-cover" />
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-500">{product.category}</span>
+                  {image && <img src={image} alt={product.name} className="mb-4 h-52 w-full rounded-3xl object-cover" />}
                   <h3 className="mt-3 text-xl font-semibold text-slate-900 dark:text-white">{product.name}</h3>
-                  <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{product.description}</p>
+                  <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{product.descripcion}</p>
                   <div className="mt-4 flex items-center gap-3">
                     <span className="text-2xl font-bold text-emerald-600">${discountedPrice.toLocaleString('es-CO')}</span>
-                    {product.discount ? <span className="text-sm text-slate-400 line-through">${product.price.toLocaleString('es-CO')}</span> : null}
+                    {product.discount_enable && product.discount_value ? <span className="text-sm text-slate-400 line-through">${product.price.toLocaleString('es-CO')}</span> : null}
                   </div>
                   <div className="mt-5 grid gap-3 sm:grid-cols-2">
                     <button
-                      onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, image: product.image, category: product.category, discount: product.discount })}
+                      onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, image, category: "Producto", discount: product.discount_enable ? product.discount_value : undefined })}
                       className="rounded-full bg-emerald-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
                     >
                       Agregar al carrito

@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import Navbar from '../components/navbar';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import NavbarUsuario from '../components/navbarUsuario';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Toaster, toast } from 'sonner';
@@ -13,22 +13,18 @@ import {
   Search,
   ShoppingCart,
   SlidersHorizontal,
-  Star,
-  Tag,
   TrendingUp,
   X,
 } from 'lucide-react';
-import { categories } from '../data/products';
 import type { Product } from '../data/products';
 import api from '../api/axios';
 
-type SortOption = 'relevance' | 'price_asc' | 'price_desc' | 'rating' | 'newest';
+type SortOption = 'relevance' | 'price_asc' | 'price_desc' | 'newest';
 
 const sortLabels: Record<SortOption, string> = {
   relevance: 'Más relevantes',
   price_asc: 'Menor precio',
   price_desc: 'Mayor precio',
-  rating: 'Mejor calificados',
   newest: 'Más recientes',
 };
 
@@ -40,40 +36,16 @@ const priceRanges = [
   { label: 'Más de $15.000.000', min: 15000000, max: Infinity },
 ];
 
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((s) => (
-        <Star key={s} className={`h-3 w-3 ${s <= Math.round(rating) ? 'fill-yellow-400 text-yellow-400' : 'text-slate-300 dark:text-slate-600'}`} />
-      ))}
-    </div>
-  );
-}
-
 function FiltersPanel({
-  selectedCategories,
-  toggleCategory,
   selectedPriceRange,
   setSelectedPriceRange,
-  onlyDiscount,
-  setOnlyDiscount,
-  minRating,
-  setMinRating,
   activeFilterCount,
   clearFilters,
-  baseResults,
 }: {
-  selectedCategories: Set<string>;
-  toggleCategory: (slug: string) => void;
   selectedPriceRange: number | null;
   setSelectedPriceRange: (value: number | null) => void;
-  onlyDiscount: boolean;
-  setOnlyDiscount: (value: boolean) => void;
-  minRating: number;
-  setMinRating: (value: number) => void;
   activeFilterCount: number;
   clearFilters: () => void;
-  baseResults: typeof allProducts;
 }) {
   return (
     <div className="space-y-6">
@@ -87,24 +59,6 @@ function FiltersPanel({
       </div>
 
       <div>
-        <h4 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Categoría</h4>
-        <div className="space-y-2">
-          {categories.map((cat) => {
-            const count = baseResults.filter((product) => product.categorySlug === cat.slug).length;
-            return (
-              <label key={cat.slug} className="flex cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 transition hover:bg-slate-100 dark:hover:bg-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <input type="checkbox" checked={selectedCategories.has(cat.slug)} onChange={() => toggleCategory(cat.slug)} className="h-4 w-4 rounded border-slate-300 accent-emerald-500" />
-                  <span className="text-sm text-slate-700 dark:text-slate-300">{cat.name}</span>
-                </div>
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-slate-800 dark:text-slate-400">{count}</span>
-              </label>
-            );
-          })}
-        </div>
-      </div>
-
-      <div>
         <h4 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Precio</h4>
         <div className="space-y-2">
           {priceRanges.map((range, index) => (
@@ -115,30 +69,6 @@ function FiltersPanel({
           ))}
         </div>
       </div>
-
-      <div>
-        <h4 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Calificación</h4>
-        <div className="space-y-2">
-          {[4.5, 4.0, 3.5].map((rating) => (
-            <button key={rating} onClick={() => setMinRating(minRating === rating ? 0 : rating)} className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${minRating === rating ? 'border border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-400' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'}`}>
-              <div className="flex gap-0.5">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className={`h-3 w-3 ${star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-slate-300 dark:text-slate-600'}`} />
-                ))}
-              </div>
-              <span>{rating}+ estrellas</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 transition hover:bg-slate-100 dark:hover:bg-slate-800">
-        <input type="checkbox" checked={onlyDiscount} onChange={(event) => setOnlyDiscount(event.target.checked)} className="h-4 w-4 rounded border-slate-300 accent-emerald-500" />
-        <div className="flex items-center gap-1.5">
-          <Tag className="h-3.5 w-3.5 text-yellow-500" />
-          <span className="text-sm text-slate-700 dark:text-slate-300">Con descuento</span>
-        </div>
-      </label>
     </div>
   );
 }
@@ -150,71 +80,53 @@ export default function SearchPage() {
   const { isAuthenticated } = useAuth();
 
   const [sort, setSort] = useState<SortOption>('relevance');
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [selectedPriceRange, setSelectedPriceRange] = useState<number | null>(null);
-  const [onlyDiscount, setOnlyDiscount] = useState(false);
-  const [minRating, setMinRating] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
 
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
 
-  const fetchProducts = useCallback(async (q: string) => {
-    setLoadingSearch(true);
-    try {
-      const res = await api.get('/catalog/products', { params: { search: q, page: 1, limit: 100 } });
-      const mapped: Product[] = (res.data.results ?? []).map((p: {
-        id: string; name: string; price: number; images?: string[];
-        discount_enable?: boolean; discount_value?: number;
-        stock?: number; descripcion?: string;
-      }) => ({
-        id: p.id as unknown as number,
-        name: p.name,
-        brand: '',
-        category: 'Producto',
-        categorySlug: 'general',
-        model: '',
-        description: p.descripcion ?? '',
-        price: p.price,
-        discount: p.discount_enable && p.discount_value ? p.discount_value : undefined,
-        rating: 0,
-        reviewCount: 0,
-        stock: p.stock ?? 0,
-        image: p.images?.[0] ?? '',
-      }));
-      setAllProducts(mapped);
-    } catch {
-      setAllProducts([]);
-    } finally {
-      setLoadingSearch(false);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchProducts(query);
-  }, [query, fetchProducts]);
+    let cancelled = false;
+    setLoadingSearch(true);
+    api.get('/catalog/products', { params: { search: query, page: 1, limit: 100 } })
+      .then((res) => {
+        if (cancelled) return;
+        const mapped: Product[] = (res.data.results ?? []).map((p: {
+          id: string; name: string; price: number; images?: string[];
+          discount_enable?: boolean; discount_value?: number;
+          stock?: number; descripcion?: string;
+        }) => ({
+          id: p.id as unknown as number,
+          name: p.name,
+          brand: '',
+          category: 'Producto',
+          categorySlug: 'general',
+          model: '',
+          description: p.descripcion ?? '',
+          price: p.price,
+          discount: p.discount_enable && p.discount_value ? p.discount_value : undefined,
+          rating: 0,
+          reviewCount: 0,
+          stock: p.stock ?? 0,
+          image: p.images?.[0] ?? '',
+        }));
+        setAllProducts(mapped);
+      })
+      .catch(() => { if (!cancelled) setAllProducts([]); })
+      .finally(() => { if (!cancelled) setLoadingSearch(false); });
+    return () => { cancelled = true; };
+  }, [query]);
 
   const baseResults = allProducts;
 
   const results = useMemo(() => {
     let list = [...baseResults];
 
-    if (selectedCategories.size > 0) {
-      list = list.filter((product) => selectedCategories.has(product.categorySlug));
-    }
-
     if (selectedPriceRange !== null) {
       const range = priceRanges[selectedPriceRange];
       list = list.filter((product) => product.price >= range.min && product.price <= range.max);
-    }
-
-    if (onlyDiscount) {
-      list = list.filter((product) => product.discount);
-    }
-
-    if (minRating > 0) {
-      list = list.filter((product) => product.rating >= minRating);
     }
 
     switch (sort) {
@@ -224,51 +136,36 @@ export default function SearchPage() {
       case 'price_desc':
         list.sort((a, b) => b.price - a.price);
         break;
-      case 'rating':
-        list.sort((a, b) => b.rating - a.rating);
-        break;
       case 'newest':
-        list.sort((a, b) => b.id - a.id);
         break;
       default:
         break;
     }
 
     return list;
-  }, [baseResults, selectedCategories, selectedPriceRange, onlyDiscount, minRating, sort]);
+  }, [baseResults, selectedPriceRange, sort]);
 
-  const activeFilterCount = selectedCategories.size + (selectedPriceRange !== null ? 1 : 0) + (onlyDiscount ? 1 : 0) + (minRating > 0 ? 1 : 0);
+  const activeFilterCount = selectedPriceRange !== null ? 1 : 0;
 
   const clearFilters = () => {
-    setSelectedCategories(new Set());
     setSelectedPriceRange(null);
-    setOnlyDiscount(false);
-    setMinRating(0);
     setSort('relevance');
   };
 
-  const toggleCategory = (slug: string) => {
-    setSelectedCategories((previous) => {
-      const next = new Set(previous);
-      if (next.has(slug)) {
-        next.delete(slug);
-      } else {
-        next.add(slug);
-      }
-      return next;
-    });
-  };
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
-      <Navbar />
+      <NavbarUsuario />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Encabezado de resultados */}
         <div className="mb-6">
           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
-            <Link to="/" className="hover:text-green-500 transition-colors flex items-center gap-1">
+            <Link to="/home-usuario" className="hover:text-green-500 transition-colors flex items-center gap-1">
               <ArrowLeft className="w-3.5 h-3.5" /> Inicio
             </Link>
             <span>/</span>
@@ -297,17 +194,10 @@ export default function SearchPage() {
           <aside className="hidden lg:block w-60 flex-shrink-0">
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 p-5 sticky top-24">
               <FiltersPanel
-                selectedCategories={selectedCategories}
-                toggleCategory={toggleCategory}
                 selectedPriceRange={selectedPriceRange}
                 setSelectedPriceRange={setSelectedPriceRange}
-                onlyDiscount={onlyDiscount}
-                setOnlyDiscount={setOnlyDiscount}
-                minRating={minRating}
-                setMinRating={setMinRating}
                 activeFilterCount={activeFilterCount}
                 clearFilters={clearFilters}
-                baseResults={baseResults}
               />
             </div>
           </aside>
@@ -357,7 +247,6 @@ export default function SearchPage() {
                         {key === 'relevance'  && <Search className="w-3.5 h-3.5" />}
                         {key === 'price_asc'  && <span className="text-xs font-bold">$↑</span>}
                         {key === 'price_desc' && <span className="text-xs font-bold">$↓</span>}
-                        {key === 'rating'     && <Star className="w-3.5 h-3.5" />}
                         {key === 'newest'     && <Clock className="w-3.5 h-3.5" />}
                         {sortLabels[key]}
                       </button>
@@ -393,10 +282,10 @@ export default function SearchPage() {
                     </button>
                   )}
                   <Link
-                    to="/"
+                    to="/home-usuario"
                     className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 hover:border-green-400 dark:hover:border-green-500 rounded-xl font-semibold transition-all"
                   >
-                    <ArrowLeft className="w-4 h-4" /> Volver al catálogo
+                    <ArrowLeft className="w-4 h-4" /> Volver al inicio
                   </Link>
                 </div>
 
@@ -472,14 +361,6 @@ export default function SearchPage() {
                             </h3>
                           </Link>
 
-                          {/* Calificación */}
-                          <div className="flex items-center gap-1.5 mb-2">
-                            <StarRating rating={product.rating} />
-                            <span className="text-gray-400 dark:text-gray-500 text-xs">
-                              ({product.reviewCount})
-                            </span>
-                          </div>
-
                           {/* Precio */}
                           <div className="flex items-baseline gap-1.5 mb-3">
                             <span className="text-green-600 dark:text-green-400 font-bold text-base">
@@ -497,7 +378,7 @@ export default function SearchPage() {
                             <button
                               onClick={() => {
                                 addToCart({
-                                  id: product.id,
+                                  id: product.id as unknown as string,
                                   name: product.name,
                                   price: product.price,
                                   image: product.image,
@@ -554,17 +435,10 @@ export default function SearchPage() {
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-5">
               <FiltersPanel
-                selectedCategories={selectedCategories}
-                toggleCategory={toggleCategory}
                 selectedPriceRange={selectedPriceRange}
                 setSelectedPriceRange={setSelectedPriceRange}
-                onlyDiscount={onlyDiscount}
-                setOnlyDiscount={setOnlyDiscount}
-                minRating={minRating}
-                setMinRating={setMinRating}
                 activeFilterCount={activeFilterCount}
                 clearFilters={clearFilters}
-                baseResults={baseResults}
               />
             </div>
             <div className="px-6 py-4 border-t border-gray-100 dark:border-slate-800">

@@ -10,6 +10,8 @@ from app.routers import HealthRouter
 from app.routers import CompanyRouter
 from app.routers import mediaRouter
 from app.routers import AdminRouter
+from app.routers import CardRouters
+from app.routers import ProfileRouters
 import app.models
 from app.middleware.AuthMiddleware import auth_middleware
 from app.middleware.CorsMiddleware import setup_cors
@@ -63,6 +65,8 @@ app.include_router(HealthRouter.router)
 app.include_router(CompanyRouter.router)
 app.include_router(mediaRouter.router)
 app.include_router(AdminRouter.router)
+app.include_router(CardRouters.router)
+app.include_router(ProfileRouters.router)
 
 
 

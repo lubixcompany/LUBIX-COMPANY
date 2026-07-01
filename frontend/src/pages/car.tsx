@@ -9,7 +9,7 @@ export default function Cart() {
   const { user } = useAuth();
   const { items, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
 
-  const handleRemoveFromCart = (productId: number) => {
+  const handleRemoveFromCart = (productId: string) => {
     removeFromCart(productId);
   };
 
@@ -17,7 +17,7 @@ export default function Cart() {
     clearCart();
   };
 
-  const handleQuantityChange = (productId: number, newQuantity: number) => {
+  const handleQuantityChange = (productId: string, newQuantity: number) => {
     if (newQuantity >= 1) {
       updateQuantity(productId, newQuantity);
     }

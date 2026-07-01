@@ -15,6 +15,10 @@ import RegistroEmpresa from "./pages/RegistroEmpresa";
 import DashboardUsuario from "./pages/dashboard-user";
 import DashboardEmpresa from "./pages/dashboard-empresa";
 import DashboardAdmin from "./pages/dashboard-admin";
+import SearchPage from "./pages/search-product";
+import ProductPage from "./pages/product";
+import Cart from "./pages/car";
+import Checkout from "./pages/checkout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -28,10 +32,14 @@ function App() {
       <Route path="/register/VerifyEmailPage" element={<VerificationCode />} />
       <Route path="/new-password" element={<NewPassword />} />
       <Route path="/registro-empresa" element={<RegistroEmpresa />} />
+      <Route path="/search" element={<ProtectedRoute roles={["user"]}><SearchPage /></ProtectedRoute>} />
+      <Route path="/product/:id" element={<ProductPage />} />
 
       {/* User routes */}
       <Route path="/home-usuario" element={<ProtectedRoute roles={["user"]}><HomeUsuario /></ProtectedRoute>} />
       <Route path="/dashboard-usuario" element={<ProtectedRoute roles={["user"]}><DashboardUsuario /></ProtectedRoute>} />
+      <Route path="/carrito" element={<ProtectedRoute roles={["user"]}><Cart /></ProtectedRoute>} />
+      <Route path="/checkout" element={<ProtectedRoute roles={["user"]}><Checkout /></ProtectedRoute>} />
 
       {/* Company routes */}
       <Route path="/home-empresa" element={<ProtectedRoute roles={["company"]}><HomeEmpresa /></ProtectedRoute>} />

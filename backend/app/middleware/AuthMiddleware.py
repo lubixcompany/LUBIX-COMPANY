@@ -20,6 +20,7 @@ PUBLIC_ROUTES = [
     "/media/proxy",
     "/docs",
     "/openapi.json",
+    "/catalog/products",
 ]
 
 ROLES_PERMISSIONS_ROUTERS = {
@@ -41,8 +42,8 @@ ROLES_PERMISSIONS_ROUTERS = {
     ],
 
     "user": [
-        "",
-        "/profile"
+        "/profile",
+        "/catalog/order",
     ]
     
 }
@@ -56,7 +57,7 @@ async def auth_middleware(request: Request, call_next):
 
     path = request.url.path
 
-    if path in PUBLIC_ROUTES:
+    if any(path.startswith(route) for route in PUBLIC_ROUTES):
         return await call_next(request)
     
     auth_header = request.headers.get("Authorization")

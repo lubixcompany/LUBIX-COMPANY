@@ -62,15 +62,15 @@ def register_user_service(user: createUser, database: Session):
 
 
 def register_company_service(user: createUser, company: createCompany, certificate, nas, database: Session):
-    role_exists = database.query(Role).filter(Role.name == "company").first()
-    nit_exists = database.query(exists().where(Company.CompanyNIT == company.companyNIT)).scalar()
-    email_exists = database.query(exists().where(Users.email == user.email)).scalar()
 
     uploaded = False
     #Direcctorio para minio
     path = f"companies/{company.companyNIT}/certificates/"
 
     try:
+        role_exists = database.query(Role).filter(Role.name == "company").first()
+        nit_exists = database.query(exists().where(Company.CompanyNIT == company.companyNIT)).scalar()
+        email_exists = database.query(exists().where(Users.email == user.email)).scalar()
 
         if not role_exists:
             raise HTTPException(status_code=409, detail="Ups no hay rol para empresa")
