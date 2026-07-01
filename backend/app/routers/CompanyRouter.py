@@ -70,12 +70,12 @@ def patch_media(
 @router.post("/dashboard/product")
 def create_product(
     request: Request,
-    nameProduct: str = Form (...), 
-    nameCatalog: str = Form(...),
+    nameProduct: str = Form(...), 
+    nameCatalog: str = Form(None),
     priceProduct: float = Form(...),
     stockProduct: int = Form(...),
     descripcionProduct: str = Form(...),
-    technicalSpecProduct: str = Form(...),
+    technicalSpecProduct: str = Form(None),
     imagesProduct: list[UploadFile] = File(None),
     nas: NasService = Depends(get_nas_service),
     database:Session = Depends(get_db)
@@ -154,6 +154,6 @@ def upgrade_my_product(
     )
 
 @router.delete("/dashboard/delete-my-product/{product_id}")
-def delete_my_product(request: Request, database: Session = Depends(get_db)):
-    
-    return delete_product_service()
+def delete_my_product(request: Request, product_id: UUID, database: Session = Depends(get_db)):
+    user_id = request.state.user_id
+    return delete_product_service(user_id=user_id, product_id=product_id, database=database)

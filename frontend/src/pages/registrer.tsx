@@ -7,7 +7,8 @@ export default function Register() {
   const navigate = useNavigate()
 
   const [form, setForm] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     tell: "",
     password: "",
@@ -52,7 +53,8 @@ export default function Register() {
 
     try {
       await api.post("/auth/register-user", {
-        fullName: form.fullName,
+        firstName: form.firstName,
+        lastName: form.lastName,
         email: form.email,
         tell: form.tell,
         password: form.password,
@@ -97,14 +99,14 @@ export default function Register() {
       )}
 
       <div className="page-container flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="w-full max-w-sm sm:max-w-md relative">
+        <div className="w-full max-w-sm sm:max-w-md">
 
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="absolute -top-12 left-0 flex items-center gap-2 text-muted hover:text-accent font-semibold transition-colors duration-200 text-sm"
+            className="flex items-center gap-1.5 text-muted hover:text-accent font-semibold transition-colors text-sm mb-4"
           >
-            <span className="text-xl">←</span> Volver
+            <span className="text-lg leading-none">&#8592;</span> Volver
           </button>
 
           <div className="text-center mb-6 sm:mb-8 mt-4">
@@ -118,16 +120,29 @@ export default function Register() {
 
           <form onSubmit={handleSubmit} className="card-form space-y-4 sm:space-y-5">
 
-            <div>
-              <label className="label-base">Nombre completo *</label>
-              <input
-                name="fullName"
-                value={form.fullName}
-                onChange={handleChange}
-                className="input-base"
-                placeholder="Juan Perez"
-                required
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label-base">Nombre *</label>
+                <input
+                  name="firstName"
+                  value={form.firstName}
+                  onChange={handleChange}
+                  className="input-base"
+                  placeholder="Juan"
+                  required
+                />
+              </div>
+              <div>
+                <label className="label-base">Apellido *</label>
+                <input
+                  name="lastName"
+                  value={form.lastName}
+                  onChange={handleChange}
+                  className="input-base"
+                  placeholder="Pérez"
+                  required
+                />
+              </div>
             </div>
 
             <div>
@@ -202,14 +217,6 @@ export default function Register() {
             </button>
           </form>
 
-          <div className="mt-4 text-center">
-            <p className="text-muted text-xs sm:text-sm">
-              Eres una empresa?{" "}
-              <Link to="/registro-empresa" className="text-accent hover:underline font-semibold">
-                Registra tu empresa
-              </Link>
-            </p>
-          </div>
 
           <div className="mt-3 pt-4 divider text-center">
             <p className="text-muted text-xs sm:text-sm">

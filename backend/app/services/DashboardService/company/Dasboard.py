@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.models.ModelUser import Users
 from app.models.ModelProduct import Catalog, Product
 from fastapi import HTTPException
@@ -7,28 +8,45 @@ from app.services.NasService import build_media_url
 
 
 
-def company_dashboard_me_service(user_id,database: Session):
+def company_dashboard_me_service(user_id, database: Session):
     user = database.query(Users).filter(Users.id == user_id).first()
 
     if not user:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    
+
     company = user.company
     role = user.role
 
-    logo = build_media_url(f"uploads/{company.CompanyLogo}")
-    banner = build_media_url(f"uploads/{company.CompanyBanner}")
+    logo = build_media_url(company.CompanyLogo) if company.CompanyLogo else None
+    banner = build_media_url(company.CompanyBanner) if company.CompanyBanner else None
+
+    total_products = database.query(func.count(Product.id)).filter(
+        Product.company_id == company.id
+    ).scalar() or 0
+
+    low_stock_products = database.query(func.count(Product.id)).filter(
+        Product.company_id == company.id,
+        Product.stock > 0,
+        Product.stock <= 5
+    ).scalar() or 0
+
+    out_of_stock_products = database.query(func.count(Product.id)).filter(
+        Product.company_id == company.id,
+        Product.stock == 0
+    ).scalar() or 0
 
     return {
         "logo": logo,
         "banner": banner,
         "nameCompany": company.nameCompany,
-        "addressCompany": user.email,
-        "memberAT": user.created_at,
+        "addressCompany": company.addressCompany,
+        "email": user.email,
+        "tell": user.tell,
+        "memberAT": str(user.created_at),
         "role": role.name,
-        "sales": 1247,
-        "stars": 4.7,
-        "reviews": 856
+        "total_products": total_products,
+        "low_stock_products": low_stock_products,
+        "out_of_stock_products": out_of_stock_products,
     }
 
 

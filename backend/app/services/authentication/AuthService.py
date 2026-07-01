@@ -33,7 +33,7 @@ def register_user_service(user: createUser, database: Session):
     try:
         hashed_password = hash_password(user.password)
         new_user = Users(
-            fullName = user.fullName,
+            fullName = f"{user.firstName} {user.lastName}",
             email = user.email,
             hashed_password = hashed_password,
             role_id = user_role.id,
@@ -89,13 +89,13 @@ def register_company_service(user: createUser, company: createCompany, certifica
         hashed_password = hash_password(user.password)
         
         new_user = Users(
-            fullName = user.fullName,
+            fullName = f"{user.firstName} {user.lastName}",
             email = user.email,
             hashed_password = hashed_password,
             role_id = role_exists.id,
             tell = user.tell,
-            isActive = user.isActive,
-            verified = user.verified,
+            isActive = False,   # pendiente de aprobación por admin
+            verified = False,
         )
 
         database.add(new_user)
@@ -216,13 +216,19 @@ def login_user_service(user: userLogin, database: Session):
     )
 
 def login_company_service(company: LoginCompany, database: Session):
-    search_company = database.query(Users).join(Company, Users.id == Company.user_id).filter(Company.CompanyNIT == company.companyNIT).first()
+    search_company = database.query(Users).join(Company, Users.id == Company.user_id).filter(Users.email == company.email).first()
     
     if not search_company:
-        raise HTTPException(status_code=400, detail="NIT o contraseña incorrectos")
+        raise HTTPException(status_code=400, detail="Correo o contraseña incorrectos")
     
-    if not verify_password(company.companyPassword, search_company.hashed_password):
-        raise HTTPException(status_code=400, detail="contraseña incorrectos")
+    if not verify_password(company.password, search_company.hashed_password):
+        raise HTTPException(status_code=400, detail="Correo o contraseña incorrectos")
+
+    if not search_company.isActive:
+        raise HTTPException(
+            status_code=403,
+            detail="Tu cuenta está pendiente de aprobación. El equipo de Lubix revisará tu solicitud y recibirás un correo cuando sea activada."
+        )
     
     access_token = create_access_token(
         user_id=str(search_company.id),

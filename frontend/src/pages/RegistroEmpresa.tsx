@@ -9,7 +9,8 @@ export default function RegistroEmpresa() {
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     empresaNombre: "",
     nit: "",
     nitDV: "",
@@ -63,7 +64,8 @@ export default function RegistroEmpresa() {
 
     try {
       const formData = new FormData()
-      formData.append("fullName", form.fullName)
+      formData.append("firstName", form.firstName)
+      formData.append("lastName", form.lastName)
       formData.append("email", form.email)
       formData.append("password", form.password)
       formData.append("tell", form.telefono)
@@ -110,118 +112,138 @@ export default function RegistroEmpresa() {
       )}
 
       <div className="page-container flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="w-full max-w-sm sm:max-w-md relative">
+        <div className="w-full max-w-2xl">
 
           <button
             onClick={() => navigate(-1)}
-            className="absolute -top-12 left-0 flex items-center gap-2 text-muted hover:text-accent font-semibold transition-colors duration-200 text-sm sm:text-base"
+            className="flex items-center gap-1.5 text-muted hover:text-accent font-semibold transition-colors text-sm mb-4"
           >
-            <span className="text-xl">←</span> Volver
+            <span className="text-lg leading-none">&#8592;</span> Volver
           </button>
 
-          <div className="text-center mb-6 sm:mb-8 mt-4">
-            <h1 className="text-accent text-3xl sm:text-4xl lg:text-5xl font-black drop-shadow-sm mb-2 sm:mb-3">
+          <div className="text-center mb-6 mt-4">
+            <h1 className="text-accent text-3xl sm:text-4xl font-black drop-shadow-sm mb-2">
               Lubix
             </h1>
-            <p className="text-muted text-sm sm:text-base lg:text-lg font-light tracking-wide">
+            <p className="text-muted text-sm sm:text-base font-light tracking-wide">
               Registra tu empresa
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="card-form space-y-4 sm:space-y-5">
+          <form onSubmit={handleSubmit} className="card-form">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
 
-            <div>
-              <label className="label-base">Nombre completo (representante) *</label>
-              <input name="fullName" value={form.fullName} onChange={handleChange}
-                className="input-base" placeholder="Juan Perez" required />
-            </div>
+              {/* ── Columna izquierda: datos del representante ── */}
+              <div className="space-y-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-muted">Tu cuenta</p>
 
-            <div>
-              <label className="label-base">Nombre de la empresa *</label>
-              <input name="empresaNombre" value={form.empresaNombre} onChange={handleChange}
-                className="input-base" placeholder="Lubix S.A.S" required />
-            </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="label-base">Nombre *</label>
+                    <input name="firstName" value={form.firstName} onChange={handleChange}
+                      className="input-base" placeholder="Juan" required />
+                  </div>
+                  <div>
+                    <label className="label-base">Apellido *</label>
+                    <input name="lastName" value={form.lastName} onChange={handleChange}
+                      className="input-base" placeholder="Pérez" required />
+                  </div>
+                </div>
 
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="label-base">NIT *</label>
-                <input name="nit" value={form.nit} onChange={handleChange}
-                  className="input-base" placeholder="900123456" required />
+                <div>
+                  <label className="label-base">Email *</label>
+                  <input name="email" type="email" value={form.email} onChange={handleChange}
+                    className="input-base" placeholder="empresa@lubix.com" required />
+                </div>
+
+                <div>
+                  <label className="label-base">Teléfono *</label>
+                  <input name="telefono" value={form.telefono} onChange={handleChange}
+                    className="input-base" placeholder="3001234567" required />
+                </div>
+
+                <div>
+                  <label className="label-base">Contraseña *</label>
+                  <input name="password" type="password" value={form.password} onChange={handleChange}
+                    className="input-base" placeholder="••••••••" required />
+                  <div className="mt-1.5 h-1.5 rounded-full bg-gray-700 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        [hasMinLength, hasUpper, hasLower, hasNumber].filter(Boolean).length <= 1 ? "bg-red-500 w-1/4" :
+                        [hasMinLength, hasUpper, hasLower, hasNumber].filter(Boolean).length === 2 ? "bg-orange-500 w-2/4" :
+                        [hasMinLength, hasUpper, hasLower, hasNumber].filter(Boolean).length === 3 ? "bg-yellow-400 w-3/4" :
+                        "bg-green-500 w-full"
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="label-base">Confirmar contraseña *</label>
+                  <input name="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange}
+                    className="input-base" placeholder="••••••••" required />
+                </div>
               </div>
-              <div className="w-20">
-                <label className="label-base">DV *</label>
-                <input name="nitDV" value={form.nitDV} onChange={handleChange}
-                  className="input-base" placeholder="7" maxLength={1} required />
+
+              {/* ── Columna derecha: datos de empresa ── */}
+              <div className="space-y-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-muted">Empresa</p>
+
+                <div>
+                  <label className="label-base">Nombre de la empresa *</label>
+                  <input name="empresaNombre" value={form.empresaNombre} onChange={handleChange}
+                    className="input-base" placeholder="Lubix S.A.S" required />
+                </div>
+
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="label-base">NIT *</label>
+                    <input name="nit" value={form.nit} onChange={handleChange}
+                      className="input-base" placeholder="900123456" required />
+                  </div>
+                  <div className="w-20">
+                    <label className="label-base">DV *</label>
+                    <input name="nitDV" value={form.nitDV} onChange={handleChange}
+                      className="input-base" placeholder="7" maxLength={1} required />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="label-base">Dirección *</label>
+                  <input name="direccion" value={form.direccion} onChange={handleChange}
+                    className="input-base" placeholder="Calle 123 #45-67" required />
+                </div>
+
+                <div>
+                  <label className="label-base">Certificado de existencia (PDF/imagen) *</label>
+                  <div
+                    onClick={() => fileRef.current?.click()}
+                    className="input-base cursor-pointer flex items-center gap-2 text-muted"
+                  >
+                    {certificate ? certificate.name : "Seleccionar archivo"}
+                  </div>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="hidden"
+                    onChange={(e) => setCertificate(e.target.files?.[0] ?? null)}
+                  />
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="label-base">Direccion *</label>
-              <input name="direccion" value={form.direccion} onChange={handleChange}
-                className="input-base" placeholder="Calle 123 #45-67" required />
-            </div>
-
-            <div>
-              <label className="label-base">Telefono *</label>
-              <input name="telefono" value={form.telefono} onChange={handleChange}
-                className="input-base" placeholder="3001234567" required />
-            </div>
-
-            <div>
-              <label className="label-base">Email *</label>
-              <input name="email" type="email" value={form.email} onChange={handleChange}
-                className="input-base" placeholder="empresa@lubix.com" required />
-            </div>
-
-            <div>
-              <label className="label-base">Contrasena *</label>
-              <input name="password" type="password" value={form.password} onChange={handleChange}
-                className="input-base" placeholder="••••••••" required />
-              <div className="mt-1.5 h-1.5 rounded-full bg-gray-700 overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-300 ${
-                    [hasMinLength, hasUpper, hasLower, hasNumber].filter(Boolean).length <= 1 ? "bg-red-500 w-1/4" :
-                    [hasMinLength, hasUpper, hasLower, hasNumber].filter(Boolean).length === 2 ? "bg-orange-500 w-2/4" :
-                    [hasMinLength, hasUpper, hasLower, hasNumber].filter(Boolean).length === 3 ? "bg-yellow-400 w-3/4" :
-                    "bg-green-500 w-full"
-                  }`}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="label-base">Confirmar contrasena *</label>
-              <input name="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange}
-                className="input-base" placeholder="••••••••" required />
-            </div>
-
-            <div>
-              <label className="label-base">Certificado de existencia (PDF/imagen) *</label>
-              <div
-                onClick={() => fileRef.current?.click()}
-                className="input-base cursor-pointer flex items-center gap-2 text-muted"
-              >
-                {certificate ? certificate.name : "Seleccionar archivo"}
-              </div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                className="hidden"
-                onChange={(e) => setCertificate(e.target.files?.[0] ?? null)}
-              />
-            </div>
-
-            <button type="submit" disabled={loading} className="btn-primary">
+            {/* Botón full-width al fondo */}
+            <button type="submit" disabled={loading} className="btn-primary mt-6 w-full">
               {loading ? "Enviando..." : "Registrar empresa"}
             </button>
           </form>
 
-          <div className="mt-6 pt-5 sm:pt-6 divider text-center">
+          <div className="mt-6 pt-5 divider text-center">
             <p className="text-muted text-xs sm:text-sm">
               Ya tienes cuenta?{" "}
-              <Link to="/login" className="text-accent hover:underline font-semibold transition-all duration-200 text-sm sm:text-base">
-                Inicia sesion
+              <Link to="/login" className="text-accent hover:underline font-semibold transition-all duration-200">
+                Inicia sesión
               </Link>
             </p>
           </div>

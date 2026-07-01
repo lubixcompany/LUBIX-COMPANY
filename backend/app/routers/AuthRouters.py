@@ -43,7 +43,8 @@ def registerUser(user: createUser, database: Session = Depends(get_db)):
 
 @router.post("/register-company")
 def registerCompany(
-    fullName: str = Form(...),
+    firstName: str = Form(...),
+    lastName: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
     tell: str = Form(...),
@@ -56,7 +57,8 @@ def registerCompany(
     database: Session = Depends(get_db)):
 
     user = createUser(
-        fullName=fullName,
+        firstName=firstName,
+        lastName=lastName,
         email=email,
         password=password,
         tell=tell
@@ -88,10 +90,7 @@ def login_user(user: userLogin, database: Session = Depends(get_db)):
     return login_user_service(user, database)
 
 @router.post("/login-company")
-def login_company(company: LoginCompany,database: Session = Depends(get_db)):
-
-    print("NIT ", company.companyNIT)
-    print("NIT ", company.companyPassword)
+def login_company(company: LoginCompany, database: Session = Depends(get_db)):
 
     return login_company_service(company, database)
 

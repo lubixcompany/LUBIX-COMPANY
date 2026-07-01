@@ -39,7 +39,7 @@ const Login: React.FC = () => {
       // Seleccionar el endpoint y payload según el tipo de usuario
       const endpoint = userType === "company" ? "/auth/login-company" : "/auth/login-user";
       const payload = userType === "company"
-        ? { companyNIT: email.trim(), companyPassword: password }
+        ? { email: email.trim(), password }
         : { email: email.trim(), password } as LoginRequest;
       const response = await api.post<LoginResponse>(endpoint, payload);
 
@@ -66,7 +66,7 @@ const Login: React.FC = () => {
       } else if (data.role === "company") {
         setTimeout(() => navigate("/home-empresa"), 1000);
       } else {
-        setTimeout(() => navigate("/search"), 1000);
+        setTimeout(() => navigate("/home-usuario"), 1000);
       }
 
 
@@ -107,6 +107,14 @@ const Login: React.FC = () => {
 
       <div className="page-container flex items-center justify-center p-3 sm:p-4">
         <div className="w-full max-w-sm">
+
+          <Link
+            to="/"
+            className="flex items-center gap-1.5 text-muted hover:text-accent font-semibold transition-colors text-sm mb-4"
+          >
+            <span className="text-lg leading-none">&#8592;</span> Volver al inicio
+          </Link>
+
           <div className="text-center mb-4 sm:mb-5">
             <h1 className="text-accent text-2xl sm:text-3xl font-black drop-shadow-sm mb-1">
               Lubix
@@ -144,13 +152,13 @@ const Login: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="card-form space-y-3 sm:space-y-4">
             <div className="mb-3 sm:mb-4">
-              <label className="label-base">{userType === "company" ? "NIT" : "Email"}</label>
+              <label className="label-base">{userType === "company" ? "Correo de empresa" : "Email"}</label>
               <input
-                type={userType === "company" ? "text" : "email"}
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input-base"
-                placeholder={userType === "company" ? "900123456" : "tu@email.com"}
+                placeholder={userType === "company" ? "empresa@lubix.com" : "tu@email.com"}
                 disabled={loading}
               />
             </div>
@@ -182,7 +190,7 @@ const Login: React.FC = () => {
               <p className="text-muted text-xs sm:text-sm">
                 ¿No tienes cuenta?{" "}
                 <Link
-                  to={userType === "company" ? "/register/empresa" : "/register/usuario"}
+                  to={userType === "company" ? "/registro-empresa" : "/register"}
                   className="text-accent hover:underline font-semibold text-xs sm:text-sm transition-colors"
                 >
                   Regístrate

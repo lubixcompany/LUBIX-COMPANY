@@ -36,7 +36,8 @@ ROLES_PERMISSIONS_ROUTERS = {
         "/company/dashboard/patch-media-logo-banner",
         "/company/dashboard/product",
         "/company/dashboard/get-my-products",
-        "/company/dashboard/update-my-product/"
+        "/company/dashboard/update-my-product/",
+        "/company/dashboard/delete-my-product/"
     ],
 
     "user": [

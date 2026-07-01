@@ -32,26 +32,22 @@ def create_product_service(
     
         if nameCatalog:
             search_catalog = database.query(Catalog).filter(Catalog.name == nameCatalog).first()
-            
             if not search_catalog:
                 raise HTTPException(status_code=404, detail="Este catalogo no existe")
-        
-        print("Esto es solo una prueba")
-        print("Name user", search_user.fullName)
-        print("id compañia: ", company.id)
-        print("Nombre compañia: ", company.nameCompany)
-        print("Id de catalogo: ", search_catalog.id)
-        print("Nombre catalogo: ", search_catalog.name)
+        else:
+            search_catalog = None
 
         image_urls = []
         technical_spec = {}
 
         if technicalSpecProduct:
             if isinstance(technicalSpecProduct, str):
-                technical_spec = json.loads(technicalSpecProduct)
+                try:
+                    technical_spec = json.loads(technicalSpecProduct)
+                except Exception:
+                    technical_spec = {}
             else:
                 technical_spec = technicalSpecProduct
-
 
         if imagesProduct:
             for file in imagesProduct:
@@ -61,12 +57,12 @@ def create_product_service(
         new_product = Product(
             name=nameProduct,
             price=priceProduct,
-            images= image_urls,
+            images=image_urls,
             stock=stockProduct,
             descripcion=descripcionProduct,
             technical_spec=technical_spec,
-            company_id = company.id,
-            catalog_id = search_catalog.id
+            company_id=company.id,
+            catalog_id=search_catalog.id if search_catalog else None
         )
 
         database.add(new_product)
@@ -89,10 +85,28 @@ def create_product_service(
         database.rollback()
         return {"error": str(e)}
 
-def select_product_service(
-        
-):
-    pass  
+def delete_product_service(user_id, product_id, database: Session):
+    try:
+        search_user = database.query(Users).filter(Users.id == user_id).first()
+        if not search_user:
+            raise HTTPException(status_code=401, detail="Usuario no encontrado")
+        company = search_user.company
+        if not company:
+            raise HTTPException(status_code=404, detail="Empresa no encontrada")
+        product = database.query(Product).filter(
+            Product.id == product_id,
+            Product.company_id == company.id
+        ).first()
+        if not product:
+            raise HTTPException(status_code=404, detail="Producto no encontrado")
+        database.delete(product)
+        database.commit()
+        return {"message": "Producto eliminado correctamente"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        database.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
     
 def update_product_service(
         user_id,
@@ -209,10 +223,5 @@ def update_product_service(
     except Exception as e:
         database.rollback()
         raise HTTPException(status_code=500, detail="Error al actualizar producto")
-
-def delete_product_service():
-    pass
-
-
 
 

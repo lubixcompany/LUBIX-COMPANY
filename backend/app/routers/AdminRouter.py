@@ -7,6 +7,7 @@ from app.database.Connection import get_db
 from app.models.ModelUser import Users
 from app.models.ModelCompany import Company
 from app.models.ModelRole import Role
+from app.services.email.template.EmailCompanyActivated import EmailCompanyActivated
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -88,7 +89,16 @@ def activate_company(user_id: UUID, request: Request, db: Session = Depends(get_
     user.verified = True
     db.commit()
 
-    return {"message": f"Empresa '{user.fullName}' activada correctamente"}
+    # Obtener nombre de empresa para el correo
+    company = db.query(Company).filter(Company.user_id == user_id).first()
+    company_name = company.nameCompany if company else user.fullName
+
+    try:
+        EmailCompanyActivated(user.email, company_name, user.fullName)
+    except Exception as email_error:
+        print("Error enviando correo de activación:", email_error)
+
+    return {"message": f"Empresa '{company_name}' activada correctamente"}
 
 
 @router.patch("/companies/{user_id}/reject")

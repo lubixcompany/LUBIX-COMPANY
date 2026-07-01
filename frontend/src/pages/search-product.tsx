@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import { useCart } from '../contexts/CartContext';
@@ -18,7 +18,9 @@ import {
   TrendingUp,
   X,
 } from 'lucide-react';
-import { allProducts, categories } from '../data/products';
+import { categories } from '../data/products';
+import type { Product } from '../data/products';
+import api from '../api/axios';
 
 type SortOption = 'relevance' | 'price_asc' | 'price_desc' | 'rating' | 'newest';
 
@@ -155,11 +157,45 @@ export default function SearchPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
 
-  const baseResults = useMemo(() => {
-    if (!query) return allProducts;
-    const normalizedQuery = query.toLowerCase();
-    return allProducts.filter((product) => [product.name, product.brand, product.category, product.model, product.description].some((value) => value.toLowerCase().includes(normalizedQuery)));
-  }, [query]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loadingSearch, setLoadingSearch] = useState(false);
+
+  const fetchProducts = useCallback(async (q: string) => {
+    setLoadingSearch(true);
+    try {
+      const res = await api.get('/catalog/products', { params: { search: q, page: 1, limit: 100 } });
+      const mapped: Product[] = (res.data.results ?? []).map((p: {
+        id: string; name: string; price: number; images?: string[];
+        discount_enable?: boolean; discount_value?: number;
+        stock?: number; descripcion?: string;
+      }) => ({
+        id: p.id as unknown as number,
+        name: p.name,
+        brand: '',
+        category: 'Producto',
+        categorySlug: 'general',
+        model: '',
+        description: p.descripcion ?? '',
+        price: p.price,
+        discount: p.discount_enable && p.discount_value ? p.discount_value : undefined,
+        rating: 0,
+        reviewCount: 0,
+        stock: p.stock ?? 0,
+        image: p.images?.[0] ?? '',
+      }));
+      setAllProducts(mapped);
+    } catch {
+      setAllProducts([]);
+    } finally {
+      setLoadingSearch(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProducts(query);
+  }, [query, fetchProducts]);
+
+  const baseResults = allProducts;
 
   const results = useMemo(() => {
     let list = [...baseResults];
@@ -246,12 +282,12 @@ export default function SearchPage() {
                 <span className="text-green-500">&ldquo;{query}&rdquo;</span>
               </h1>
               <span className="text-gray-500 dark:text-gray-400 text-sm sm:mb-0.5">
-                — {baseResults.length} {baseResults.length === 1 ? 'producto encontrado' : 'productos encontrados'}
+                {loadingSearch ? '— Buscando...' : `— ${baseResults.length} ${baseResults.length === 1 ? 'producto encontrado' : 'productos encontrados'}`}
               </span>
             </div>
           ) : (
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Todos los productos
+              {loadingSearch ? 'Cargando productos...' : 'Todos los productos'}
             </h1>
           )}
         </div>
