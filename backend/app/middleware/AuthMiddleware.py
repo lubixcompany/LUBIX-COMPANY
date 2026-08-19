@@ -21,7 +21,12 @@ PUBLIC_ROUTES = [
     "/docs",
     "/openapi.json",
     "/media/proxy",
-    "/company/dashboard/update-my-product"
+    "/company/dashboard/update-my-product",
+    "/catalog/products",
+    "/catalog/categories",
+    "/catalog/featured",
+    "/catalog/new",
+    "/health",
 ]
 
 ROLES_PERMISSIONS_ROUTERS = {

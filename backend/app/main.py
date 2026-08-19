@@ -15,6 +15,7 @@ from app.database.Connection import SessionLocal
 from app.utils.seed import run_seed
 from app.Config import config
 from app.routers.ProfileRouters import router as profile_router
+from app.routers.CatalogRouter import router as catalog_router
 
 
 
@@ -51,5 +52,6 @@ app.include_router(HealthRouter.router)
 app.include_router(CompanyRouter.router)
 app.include_router(mediaRouter.router)
 app.include_router(profile_router)
+app.include_router(catalog_router)
 
 

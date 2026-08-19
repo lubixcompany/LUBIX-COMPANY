@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 import uuid
 
 client = Minio(
-    "minio:9000",
+    "localhost:9000",
     access_key=config.MINIO_ROOT_USER,
     secret_key=config.MINIO_ROOT_PASSWORD,
     secure=False
